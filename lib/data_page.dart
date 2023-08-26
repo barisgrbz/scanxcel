@@ -48,6 +48,7 @@ class _DataPageState extends State<DataPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blueGrey,
         title: Text('Verileri Görüntüle'),
       ),
       body: ListView.builder(

@@ -6,7 +6,8 @@ import 'package:path/path.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:excel/excel.dart';
 import 'dart:io';
-
+import 'package:open_file_plus/open_file_plus.dart';
+import 'dart:async';
 import 'data_page.dart';
 
 void main() {
@@ -144,7 +145,9 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blueGrey,
-        title: Text('ScanExcel'),
+        title: Center(
+          child: Text('ScanXcel'),
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.share),
@@ -156,7 +159,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   'Hey Senin İçin Bulduğum Uygulamaya Bir Göz At!\n\n$UrlPreview');
             },
           ),
-         
           PopupMenuButton(
             offset: Offset(0, 50),
             padding: EdgeInsets.zero,
@@ -181,7 +183,7 @@ class _MyHomePageState extends State<MyHomePage> {
             TextField(
               controller: barcodeController,
               decoration: InputDecoration(
-                labelText: 'Taranan Barkod',
+                labelText: 'Barkodu Tarat',
                 suffixIcon: IconButton(
                   icon: Icon(Icons.camera_alt_sharp),
                   onPressed: scanBarcode,
@@ -198,7 +200,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 labelText: 'Açıklama',
                 suffixIcon: IconButton(
                   icon: Icon(Icons.border_color_outlined),
-                  onPressed: scanBarcode,
+                  onPressed: () => {},
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20.0),
@@ -210,9 +212,9 @@ class _MyHomePageState extends State<MyHomePage> {
               Padding(
                 padding: EdgeInsets.all(8.0),
                 child: SquareButton(
-                  color: Color.fromARGB(255, 105, 216, 111),
+                  color: Color.fromARGB(255, 45, 214, 54),
                   onPressed: saveData,
-                  buttonName: 'Veri Tabanına Kaydet',
+                  buttonName: 'Kaydet',
                   icon: Icon(Icons.all_inbox_outlined),
                 ),
               ),
@@ -226,7 +228,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       MaterialPageRoute(builder: (context) => DataPage()),
                     );
                   },
-                  buttonName: 'Verileri Görüntüle',
+                  buttonName: 'Kayıtları Görüntüle',
                   icon: Icon(Icons.search_outlined),
                 ),
               ),
@@ -235,9 +237,9 @@ class _MyHomePageState extends State<MyHomePage> {
               Padding(
                 padding: EdgeInsets.all(8.0),
                 child: SquareButton(
-                  color: Color.fromARGB(255, 105, 216, 111),
+                  color: Color.fromARGB(166, 224, 112, 112),
                   onPressed: clearDatabase,
-                  buttonName: 'Veri Tabanını Temizle',
+                  buttonName: 'Barkodları Temizle',
                   icon: Icon(Icons.delete_forever),
                 ),
               ),
@@ -246,11 +248,95 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: SquareButton(
                   color: Color.fromARGB(255, 105, 216, 111),
                   onPressed: exportToExcel,
-                  buttonName: 'Excele Aktar',
+                  buttonName: 'Excel\'e Aktar',
                   icon: Icon(Icons.upload_file_rounded),
                 ),
               ),
             ]),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: SquareButton(
+                  color: Color.fromARGB(255, 105, 216, 111),
+                  onPressed: () async {
+                    try {
+                      await OpenFile.open(
+                          "/storage/emulated/0/Download/barkodlar.xlsx");
+                      print("girdi");
+                    } catch (error) {
+                      print("Error opening file: $error");
+                    }
+                  },
+                  buttonName: 'Excel\'i Göster',
+                  icon: Icon(Icons.info_outline),
+                ),
+              ),
+            ]),
+          ],
+        ),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            SizedBox(
+              height: 400,
+              child: DrawerHeader(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundImage:
+                          NetworkImage('https://picsum.photos/250?image=9'),
+                    ),
+                    Text('ScanXcel'),
+                    Text('versiyon:1.0.0'),
+                    Text(
+                        'iletişim ve geliştirme için github ve sosyal medya hesaplarımızı takip etmeyi unutmayın!'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.person),
+                          onPressed: () {
+                            // Navigate to user profile
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.mail),
+                          onPressed: () {
+                            // Navigate to contact form
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.share),
+                          onPressed: () async {
+                            final UrlPreview =
+                                'https://play.google.com/store/apps/details?id=com.bimilyondunya.eventswork&pcampaignid=web_share';
+
+                            await Share.share(
+                                'Hey Senin İçin Bulduğum Uygulamaya Bir Göz At!\n\n$UrlPreview');
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            ListTile(
+              title: Text('Item 1'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text('Ayarlar & Destek'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
           ],
         ),
       ),
@@ -297,7 +383,7 @@ class SquareButton extends StatelessWidget {
             if (icon != null) icon!,
             Text(
               buttonName,
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
               textAlign: TextAlign.center,
             ),
           ],
