@@ -6,7 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:excel/excel.dart';
 import 'dart:io';
 
-import 'data_page.dart'; // Verileri görüntülemek için oluşturduğumuz sayfa
+import 'data_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -102,7 +102,8 @@ class _MyHomePageState extends State<MyHomePage> {
     List<Map<String, dynamic>> queryResult = await database.query('barkodlar');
 
     if (queryResult.isEmpty) {
-      Fluttertoast.showToast(msg: 'Veri tabanında kaydedilmiş veri bulunmuyor.');
+      Fluttertoast.showToast(
+          msg: 'Veri tabanında kaydedilmiş veri bulunmuyor.');
       return;
     }
 
@@ -128,7 +129,8 @@ class _MyHomePageState extends State<MyHomePage> {
     File excelFile = File(filePath);
     excelFile.writeAsBytesSync(excel.encode()!);
 
-    Fluttertoast.showToast(msg: 'Veriler Excel\'e aktarıldı ve Download klasörüne kaydedildi.');
+    Fluttertoast.showToast(
+        msg: 'Veriler Excel\'e aktarıldı ve Download klasörüne kaydedildi.');
   }
 
   @override
@@ -142,7 +144,33 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Barkod Okuma ve Excele Aktarma'),
+        title: Text('ScanExcel'),
+        actions: [
+          PopupMenuButton(
+            offset: Offset(0, 50),
+            padding: EdgeInsets.zero,
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                child: Text('Hakkımızda'),
+              ),
+            ],
+            initialValue: 1,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10))),
+            color: Colors.grey[200],
+          ),
+          PopupMenuItem(
+            value: 'item2',
+            child: Row(
+              children: [
+                Text('Item 2'),
+                SizedBox(
+                    width: 8), // add some spacing between the text and the icon
+                Icon(Icons.share), // add an icon to the right of the item
+              ],
+            ),
+          ),
+        ],
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -158,6 +186,13 @@ class _MyHomePageState extends State<MyHomePage> {
               controller: barcodeController,
               decoration: InputDecoration(
                 labelText: 'Taranan Barkod',
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.camera),
+                  onPressed: scanBarcode,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
               ),
             ),
             SizedBox(height: 16.0),
@@ -165,6 +200,10 @@ class _MyHomePageState extends State<MyHomePage> {
               controller: manualInputController,
               decoration: InputDecoration(
                 labelText: 'Manuel Giriş',
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.drafts),
+                  onPressed: scanBarcode,
+                ),
               ),
             ),
             SizedBox(height: 16.0),
