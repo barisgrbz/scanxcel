@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Barkod Uygulaması',
+      title: 'ScanXcel',
       theme: ThemeData(fontFamily: 'Roboto'),
       home: MyHomePage(),
     );
@@ -399,7 +399,7 @@ class SquareButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          primary: color,
+          backgroundColor: color,
           side: BorderSide(
             color: Colors.grey,
           ),
