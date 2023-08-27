@@ -183,7 +183,7 @@ class _MyHomePageState extends State<MyHomePage> {
             TextField(
               controller: barcodeController,
               decoration: InputDecoration(
-                labelText: 'Barkodu Tarat',
+                labelText: 'Barkod&Qr Tarat',
                 suffixIcon: IconButton(
                   icon: Icon(Icons.camera_alt_sharp),
                   onPressed: scanBarcode,
