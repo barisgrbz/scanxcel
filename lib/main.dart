@@ -58,6 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void saveData() async {
+    updateCurrentTime();
     String scannedBarcode = barcodeController.text;
     String manualInput = manualInputController.text;
     String timeStamp = timeStampController.text;
