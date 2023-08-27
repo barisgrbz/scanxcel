@@ -11,30 +11,45 @@ class DataPage extends StatefulWidget {
 }
 
 class _DataPageState extends State<DataPage> {
+  TextEditingController searchController = TextEditingController();
   List<Map<String, dynamic>> data = [];
+  List<Map<String, dynamic>> filteredData = [];
 
   Future<void> getData() async {
-    final database = openDatabase(
+    final database = await openDatabase(
       join(await getDatabasesPath(), 'barkod_database.db'),
     );
 
-    final List<Map<String, dynamic>> queryResult = await database.then((db) {
-      return db.query('barkodlar');
-    });
+    final List<Map<String, dynamic>> queryResult = await database.query('barkodlar');
 
     setState(() {
       data = queryResult;
+      filteredData = queryResult;
     });
   }
 
+  void filterData(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        filteredData = data;
+      });
+    } else {
+      setState(() {
+        filteredData = data
+            .where((item) =>
+        item['barkod'].toString().contains(query) ||
+            item['manuelDeger'].toString().contains(query))
+            .toList();
+      });
+    }
+  }
+
   Future<void> deleteData(int id) async {
-    final database = openDatabase(
+    final database = await openDatabase(
       join(await getDatabasesPath(), 'barkod_database.db'),
     );
 
-    await database.then((db) {
-      db.delete('barkodlar', where: 'id = ?', whereArgs: [id]);
-    });
+    await database.delete('barkodlar', where: 'id = ?', whereArgs: [id]);
 
     Fluttertoast.showToast(msg: 'Veri silindi.');
     getData();
@@ -48,7 +63,7 @@ class _DataPageState extends State<DataPage> {
     await database.delete('barkodlar'); // Tüm verileri siler
 
     Fluttertoast.showToast(msg: 'Tüm veriler silindi.');
-    getData(); // Verileri yeniden almak için gerekli işlemi yapabilirsiniz
+    getData();
   }
 
   @override
@@ -64,20 +79,46 @@ class _DataPageState extends State<DataPage> {
         backgroundColor: Colors.blueGrey,
         title: Text('Verileri Görüntüle'),
       ),
-      body: ListView.builder(
-        itemCount: data.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text('Barkod: ${data[index]['barkod']}'),
-            subtitle: Text('Manuel Değer: ${data[index]['manuelDeger']}'),
-            trailing: IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () {
-                deleteData(data[index]['id']);
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: searchController,
+              onChanged: (query) {
+                filterData(query);
+              },
+              decoration: InputDecoration(
+                labelText: 'Arama',
+                prefixIcon: Icon(Icons.search), // Arama simgesi
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: filteredData.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text('Barkod: ${filteredData[index]['barkod']}'),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Manuel Değer: ${filteredData[index]['manuelDeger']}'),
+                      Text('Zaman Damgası: ${filteredData[index]['zamanDamgasi']}'), // Zaman damgası değeri eklendi
+                    ],
+                  ),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      deleteData(filteredData[index]['id']);
+                    },
+                  ),
+                );
               },
             ),
-          );
-        },
+          ),
+        ],
       ),
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
@@ -85,34 +126,33 @@ class _DataPageState extends State<DataPage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: SpeedDial(
-          icon: Icons.settings,
-          backgroundColor: Colors.blueGrey,
-          children: [
-            SpeedDialChild(
-              child: const Icon(Icons.arrow_circle_down_rounded,
-                  color: Colors.white),
-              label: 'Excel\'e Aktar',
-              backgroundColor: Color.fromARGB(255, 105, 216, 111),
-              onTap: () {
-                exportToExcel();
-              },
-            ),
-            SpeedDialChild(
-              child: const Icon(Icons.camera_alt_rounded, color: Colors.white),
-              label: 'Barkod Tara',
-              backgroundColor: Colors.blueAccent,
-              onTap: () {},
-            ),
-            SpeedDialChild(
-              child: const Icon(Icons.delete_forever_outlined,
-                  color: Colors.white),
-              label: 'Tüm Barkodları Temizle',
-              backgroundColor: Color.fromARGB(166, 224, 112, 112),
-              onTap: () {
-                deleteAllData();
-              },
-            ),
-          ]),
+        icon: Icons.settings,
+        backgroundColor: Colors.blueGrey,
+        children: [
+          SpeedDialChild(
+            child: const Icon(Icons.arrow_circle_down_rounded, color: Colors.white),
+            label: 'Excel\'e Aktar',
+            backgroundColor: Color.fromARGB(255, 105, 216, 111),
+            onTap: () {
+              exportToExcel();
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.camera_alt_rounded, color: Colors.white),
+            label: 'Barkod Tara',
+            backgroundColor: Colors.blueAccent,
+            onTap: () {},
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.delete_forever_outlined, color: Colors.white),
+            label: 'Tüm Barkodları Temizle',
+            backgroundColor: Color.fromARGB(166, 224, 112, 112),
+            onTap: () {
+              deleteAllData();
+            },
+          ),
+        ],
+      ),
     );
   }
 }

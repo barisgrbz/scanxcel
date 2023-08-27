@@ -8,6 +8,7 @@ import 'package:excel/excel.dart';
 import 'dart:io';
 import 'package:open_file_plus/open_file_plus.dart';
 import 'dart:async';
+import 'package:intl/intl.dart';
 import 'data_page.dart';
 
 void main() {
@@ -33,13 +34,16 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   TextEditingController barcodeController = TextEditingController();
   TextEditingController manualInputController = TextEditingController();
+  TextEditingController timeStampController = TextEditingController();
+
+  late DateTime currentTime;
 
   Future<void> scanBarcode() async {
     String barcode = await FlutterBarcodeScanner.scanBarcode(
-      '#ff6666', // Tarama ekranının arka plan rengi
-      'İptal', // İptal düğmesinin metni
-      true, // Flash ışığını etkinleştirme
-      ScanMode.BARCODE, // Sadece barkod tarama
+      '#ff6666',
+      'İptal',
+      true,
+      ScanMode.BARCODE,
     );
 
     setState(() {
@@ -47,9 +51,16 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void updateCurrentTime() {
+    currentTime = DateTime.now();
+    String formattedTime = DateFormat('dd-MM-yyyy HH:mm:ss').format(currentTime);
+    timeStampController.text = formattedTime;
+  }
+
   void saveData() async {
     String scannedBarcode = barcodeController.text;
     String manualInput = manualInputController.text;
+    String timeStamp = timeStampController.text;
 
     if (scannedBarcode.isEmpty && manualInput.isEmpty) {
       Fluttertoast.showToast(
@@ -61,16 +72,21 @@ class _MyHomePageState extends State<MyHomePage> {
       join(await getDatabasesPath(), 'barkod_database.db'),
       onCreate: (db, version) {
         return db.execute(
-          'CREATE TABLE barkodlar(id INTEGER PRIMARY KEY AUTOINCREMENT, barkod TEXT, manuelDeger TEXT)',
+          'CREATE TABLE barkodlar(id INTEGER PRIMARY KEY AUTOINCREMENT, barkod TEXT, manuelDeger TEXT, zamanDamgasi TEXT)',
         );
       },
-      version: 1,
+      onUpgrade: (db, oldVersion, newVersion) {
+        if (oldVersion < newVersion) {
+          db.execute('ALTER TABLE barkodlar ADD COLUMN zamanDamgasi TEXT');
+        }
+      },
+      version: 2,
     );
 
     await database.then((db) async {
       await db.insert(
         'barkodlar',
-        {'barkod': scannedBarcode, 'manuelDeger': manualInput},
+        {'barkod': scannedBarcode, 'manuelDeger': manualInput, 'zamanDamgasi': timeStamp},
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     });
@@ -79,6 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       barcodeController.clear();
       manualInputController.clear();
+      updateCurrentTime();
     });
   }
 
@@ -110,15 +127,12 @@ class _MyHomePageState extends State<MyHomePage> {
     Excel excel = Excel.createExcel();
     Sheet sheet = excel['Sheet1'];
 
-    // Başlık satırını ekle
-    sheet.appendRow(['ID', 'Barkod', 'Manuel Değer']);
+    sheet.appendRow(['ID', 'Barkod', 'Manuel Değer', 'Zaman Damgası']);
 
-    // Verileri ekle
     for (Map<String, dynamic> row in queryResult) {
-      sheet.appendRow([row['id'], row['barkod'], row['manuelDeger']]);
+      sheet.appendRow([row['id'], row['barkod'], row['manuelDeger'], row['zamanDamgasi']]);
     }
 
-    // Excel dosyasını kaydetmek için dosya gezgini aç
     final downloadsDirectory = Directory('/storage/emulated/0/Download');
     if (!downloadsDirectory.existsSync()) {
       downloadsDirectory.createSync(recursive: true);
@@ -133,10 +147,26 @@ class _MyHomePageState extends State<MyHomePage> {
         msg: 'Veriler Excel\'e aktarıldı ve Download klasörüne kaydedildi.');
   }
 
+  void openExcelFile() async {
+    try {
+      await OpenFile.open("/storage/emulated/0/Download/barkodlar.xlsx");
+      print("Dosya açıldı");
+    } catch (error) {
+      print("Dosya açılırken hata oluştu: $error");
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    updateCurrentTime();
+  }
+
   @override
   void dispose() {
     barcodeController.dispose();
     manualInputController.dispose();
+    timeStampController.dispose();
     super.dispose();
   }
 
@@ -152,11 +182,8 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
             icon: Icon(Icons.share),
             onPressed: () async {
-              final UrlPreview =
-                  'https://play.google.com/store/apps/details?id=com.bimilyondunya.eventswork&pcampaignid=web_share';
-
-              await Share.share(
-                  'Hey Senin İçin Bulduğum Uygulamaya Bir Göz At!\n\n$UrlPreview');
+              final UrlPreview = 'https://play.google.com/store/apps/details?id=com.bimilyondunya.eventswork&pcampaignid=web_share';
+              await Share.share('Hey Senin İçin Bulduğum Uygulamaya Bir Göz At!\n\n$UrlPreview');
             },
           ),
           PopupMenuButton(
@@ -200,8 +227,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 labelText: 'Açıklama',
                 suffixIcon: IconButton(
                   icon: Icon(Icons.border_color_outlined),
-                  onPressed: () => {},
+                  onPressed: () {},
                 ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+              ),
+            ),
+            SizedBox(height: 16.0),
+            TextField(
+              controller: timeStampController,
+              decoration: InputDecoration(
+                labelText: 'Zaman Damgası',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20.0),
                 ),
@@ -258,15 +295,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: EdgeInsets.all(8.0),
                 child: SquareButton(
                   color: Color.fromARGB(255, 105, 216, 111),
-                  onPressed: () async {
-                    try {
-                      await OpenFile.open(
-                          "/storage/emulated/0/Download/barkodlar.xlsx");
-                      print("girdi");
-                    } catch (error) {
-                      print("Error opening file: $error");
-                    }
-                  },
+                  onPressed: openExcelFile,
                   buttonName: 'Excel\'i Göster',
                   icon: Icon(Icons.info_outline),
                 ),
@@ -288,10 +317,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     CircleAvatar(
                       radius: 50,
                       backgroundImage:
-                          NetworkImage('https://picsum.photos/250?image=9'),
+                      NetworkImage('https://picsum.photos/250?image=9'),
                     ),
                     Text('ScanXcel'),
-                    Text('versiyon:1.0.0'),
+                    Text('versiyon:1.0.3'),
                     Text(
                         'iletişim ve geliştirme için github ve sosyal medya hesaplarımızı takip etmeyi unutmayın!'),
                     Row(
@@ -300,13 +329,13 @@ class _MyHomePageState extends State<MyHomePage> {
                         IconButton(
                           icon: Icon(Icons.person),
                           onPressed: () {
-                            // Navigate to user profile
+                            // Kullanıcı profilini görüntülemek için
                           },
                         ),
                         IconButton(
                           icon: Icon(Icons.mail),
                           onPressed: () {
-                            // Navigate to contact form
+                            // İletişim formuna gitmek için
                           },
                         ),
                         IconButton(
@@ -326,7 +355,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             ListTile(
-              title: Text('Item 1'),
+              title: Text('Öğe 1'),
               onTap: () {
                 Navigator.pop(context);
               },
