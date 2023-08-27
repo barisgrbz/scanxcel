@@ -315,15 +315,24 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundImage:
-                      NetworkImage('https://picsum.photos/250?image=9'),
+                    SizedBox(
+                      height: 200,
+                      width: 200,
+                      child: Image.asset('assets/icons/icon.png'),
                     ),
                     Text('ScanXcel'),
                     Text('versiyon:1.0.3'),
                     Text(
-                        'iletişim ve geliştirme için github ve sosyal medya hesaplarımızı takip etmeyi unutmayın!'),
+                      'Ana Özellikler:\n\n'
+                          '🔍 Barkod ve QR Kod Tarayıcı: ScanXcel, üstün teknolojisi sayesinde hızlı ve hassas bir şekilde barkodlarınızı ve QR kodlarınızı tarar. Ürünlerinizi anında kaydetmek veya bilgi toplamak artık daha basit.\n\n'
+                          '📝 Manuel Bilgi Girişi: Ürün veya nesnelerinizin barkodunu tarayamıyorsanız, manuel olarak açıklama girebilirsiniz. Bilgi girişi kolay ve sezgisel bir şekilde gerçekleşir.\n\n'
+                          '🗃️ Veri Yönetimi: ScanXcel, kaydettiğiniz verileri güvenli bir şekilde yönetmenizi sağlar. Taramalarınızı, manuel girişlerinizi ve tarihleri kolayca görüntüleyebilirsiniz.\n\n'
+                          '📊 Excel\'e Aktar: Topladığınız verileri tek bir dokunuşla Excel dosyasına aktarabilirsiniz. Bu özellik sayesinde verilerinizi daha fazla analiz etmek veya paylaşmak çok daha basit hale gelir.\n\n'
+                          '📂 Veri Tabanı Temizleme: İhtiyacınız olmayan verileri hızla temizlemek için veri tabanı temizleme seçeneği ile veri karmaşasından kurtulun.\n\n'
+                          '🚀 Hızlı ve Basit Kullanım: ScanXcel, sezgisel arayüzü ve pratik kullanımıyla veri yönetimini karmaşık olmaktan çıkarır.\n\n'
+                          '📲 Uygulama Paylaşımı: Arkadaşlarınızla ve iş arkadaşlarınızla uygulamayı paylaşarak daha verimli çalışmalarına yardımcı olun.',
+                      style: TextStyle(fontSize: 10),  // Yazı boyutunu burada ayarladık
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
