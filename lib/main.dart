@@ -153,7 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
       await OpenFile.open("/storage/emulated/0/Download/barkodlar.xlsx");
       print("Dosya açıldı");
     } catch (error) {
-      print("Dosya açılırken hata oluştu: $error");
+      print("hakan Dosya açılırken hata oluştu: $error");
     }
   }
 
