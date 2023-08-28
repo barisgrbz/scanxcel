@@ -7,7 +7,6 @@ import 'package:path/path.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:excel/excel.dart';
 import 'dart:io';
-import 'package:open_file_plus/open_file_plus.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'data_page.dart';
@@ -109,52 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void exportToExcel() async {
-    final databasePath = await getDatabasesPath();
-    final database = await openDatabase(
-      join(databasePath, 'barkod_database.db'),
-    );
 
-    List<Map<String, dynamic>> queryResult = await database.query('barkodlar');
-
-    if (queryResult.isEmpty) {
-      Fluttertoast.showToast(
-          msg: 'Veri tabanında kaydedilmiş veri bulunmuyor.');
-      return;
-    }
-
-    Excel excel = Excel.createExcel();
-    Sheet sheet = excel['Sheet1'];
-
-    sheet.appendRow(['ID', 'Barkod', 'Manuel Değer', 'Zaman Damgası']);
-
-    for (Map<String, dynamic> row in queryResult) {
-      sheet.appendRow(
-          [row['id'], row['barkod'], row['manuelDeger'], row['zamanDamgasi']]);
-    }
-
-    final downloadsDirectory = Directory('/storage/emulated/0/Download');
-    if (!downloadsDirectory.existsSync()) {
-      downloadsDirectory.createSync(recursive: true);
-    }
-
-    final filePath = '${downloadsDirectory.path}/barkodlar.xlsx';
-
-    File excelFile = File(filePath);
-    excelFile.writeAsBytesSync(excel.encode()!);
-
-    Fluttertoast.showToast(
-        msg: 'Veriler Excel\'e aktarıldı ve Download klasörüne kaydedildi.');
-  }
-
-  void openExcelFile() async {
-    try {
-      await OpenFile.open("/storage/emulated/0/Download/barkodlar.xlsx");
-      print("Dosya açıldı");
-    } catch (error) {
-      print("Dosya açılırken hata oluştu: $error");
-    }
-  }
 
   @override
   void initState() {
@@ -183,12 +137,11 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: Icon(Icons.notifications),
             onPressed: () async {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => NotificationPage()),
-                );
+                context,
+                MaterialPageRoute(builder: (context) => NotificationPage()),
+              );
             },
           ),
-          
         ],
       ),
       body: SingleChildScrollView(
