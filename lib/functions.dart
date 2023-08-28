@@ -7,6 +7,19 @@ import 'package:excel/excel.dart';
 import 'dart:io';
 import 'dart:async';
 
+
+void clearDatabase() async {
+    final databasePath = await getDatabasesPath();
+    final database = await openDatabase(
+      join(databasePath, 'barkod_database.db'),
+    );
+
+    await database.delete('barkodlar');
+
+    Fluttertoast.showToast(msg: 'Veri tabanı temizlendi.');
+  }
+
+
 void exportToExcel() async {
   final databasePath = await getDatabasesPath();
   final database = await openDatabase(
@@ -59,3 +72,4 @@ class BarcodeHelper {
     barcodeController.text = barcode;
   }
 }
+
