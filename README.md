@@ -1,4 +1,4 @@
 # scanxcel
 
 Barkod Tara ve Excel'e Export Et
-------Barış GÜRBÜZ-------
+------Barış GÜRBÜZ & BimilyonDunya-------
