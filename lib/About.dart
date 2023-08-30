@@ -60,7 +60,8 @@ class AboutUsPage extends StatelessWidget {
             SizedBox(height: 8),
             ListTile(
               leading: Icon(Icons.check),
-              title: Text('Diyarbakırda ilk proje çalışmalarımız başladı, 2023'),
+              title:
+                  Text('Diyarbakırda ilk proje çalışmalarımız başladı, 2023'),
             ),
             ListTile(
               leading: Icon(Icons.check),
