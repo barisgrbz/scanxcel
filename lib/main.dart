@@ -108,8 +108,6 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-
-
   @override
   void initState() {
     super.initState();
@@ -127,6 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 230, 230, 230),
       appBar: AppBar(
         backgroundColor: Colors.blueGrey,
         title: Center(
@@ -154,6 +153,8 @@ class _MyHomePageState extends State<MyHomePage> {
               TextField(
                 controller: barcodeController,
                 decoration: InputDecoration(
+                  fillColor: Colors.white,
+                  filled: true,
                   labelText: 'Barkod&Qr Tarat',
                   suffixIcon: IconButton(
                     icon: Icon(Icons.camera_alt_sharp),
@@ -168,6 +169,8 @@ class _MyHomePageState extends State<MyHomePage> {
               TextField(
                 controller: manualInputController,
                 decoration: InputDecoration(
+                  fillColor: Colors.white,
+                  filled: true,
                   labelText: 'Açıklama',
                   suffixIcon: IconButton(
                     icon: Icon(Icons.border_color_outlined),
@@ -190,21 +193,20 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               SizedBox(height: 20),
               Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
+                    Expanded(
                       child: SquareButton(
-                        color: Color.fromARGB(255, 45, 214, 54),
+                        color: Colors.white,
                         onPressed: saveData,
                         buttonName: 'Kaydet',
-                        icon: Icon(Icons.all_inbox_outlined),
+                        icon: Icon(Icons.save_alt_rounded, color: Colors.green),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
+                    SizedBox(width: 8),
+                    Expanded(
                       child: SquareButton(
-                        color: Color.fromARGB(255, 105, 216, 111),
+                        color: Colors.white,
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -212,42 +214,46 @@ class _MyHomePageState extends State<MyHomePage> {
                           );
                         },
                         buttonName: 'Kayıtları Görüntüle',
-                        icon: Icon(Icons.search_outlined),
+                        icon: Icon(Icons.search_outlined, color: Colors.blue),
                       ),
                     ),
                   ]),
+              SizedBox(height: 8),
               Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
+                    Expanded(
                       child: SquareButton(
-                        color: Color.fromARGB(166, 224, 112, 112),
+                        color: Colors.white,
                         onPressed: clearDatabase,
                         buttonName: 'Barkodları Temizle',
-                        icon: Icon(Icons.delete_forever),
+                        icon: Icon(Icons.delete_forever, color: Colors.red),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
+                    SizedBox(width: 8),
+                    Expanded(
                       child: SquareButton(
-                        color: Color.fromARGB(255, 105, 216, 111),
+                        color: Colors.white,
                         onPressed: exportToExcel,
                         buttonName: 'Excel\'e Aktar',
-                        icon: Icon(Icons.upload_file_rounded),
+                        icon: Icon(Icons.upload_file_rounded,
+                            color: Colors.greenAccent),
                       ),
                     ),
                   ]),
+              SizedBox(height: 8),
               Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
+                    Expanded(
                       child: SquareButton(
-                        color: Color.fromARGB(255, 105, 216, 111),
+                        color: Colors.white,
                         onPressed: openExcelFile,
                         buttonName: 'Excel\'i Göster',
-                        icon: Icon(Icons.info_outline),
+                        icon: Icon(
+                          Icons.info_outline,
+                          color: Colors.orange,
+                        ),
                       ),
                     ),
                   ]),
@@ -366,14 +372,21 @@ class SquareButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(10.0),
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            if (icon != null) icon!,
+            if (icon != null)
+              Padding(
+                padding:
+                    EdgeInsets.only(right: 8), // Simge ile metin arasına boşluk
+                child: icon!,
+              ),
             Text(
               buttonName,
               style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
               textAlign: TextAlign.center,
+              softWrap: true,
+              overflow: TextOverflow.fade,
             ),
           ],
         ),
