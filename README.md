@@ -37,7 +37,7 @@ Katkıda bulunmak isterseniz PR gönderebilir veya sorularınız için iletişim
 
 
 Bu proje GNU General Public License v2.0 (GPL-2.0) altında lisanslanmıştır.  
-Telif Hakkı (C) 2025 Barış Gürbüz.
+Telif Hakkı (C) 2023 Barış Gürbüz.
 
 Daha fazla bilgi için LICENSE dosyasına bakınız.
 
