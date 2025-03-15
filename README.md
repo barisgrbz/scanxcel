@@ -28,8 +28,17 @@ flutter run
 - [ ] Çoklu platform desteği
 - [ ] Verileri bulut platformlarına aktarma
 
+
+
 ## 🤝 Katkıda Bulunma
 Katkıda bulunmak isterseniz PR gönderebilir veya sorularınız için iletişime geçebilirsiniz:
 
 📫 **barisgrbz1035@gmail.com**
+
+
+Bu proje GNU General Public License v2.0 (GPL-2.0) altında lisanslanmıştır.  
+Telif Hakkı (C) 2025 Barış Gürbüz.
+
+Daha fazla bilgi için LICENSE dosyasına bakınız.
+
 
