@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'functions.dart';
+
 import 'services/data_service.dart';
 import 'dart:convert';
 
 class DataPage extends StatefulWidget {
+  const DataPage({super.key});
+  
   @override
-  _DataPageState createState() => _DataPageState();
+  DataPageState createState() => DataPageState();
 }
 
-class _DataPageState extends State<DataPage> {
+class DataPageState extends State<DataPage> {
   List<Map<String, dynamic>> data = [];
   List<Map<String, dynamic>> filteredData = [];
   bool isLoading = false;
@@ -198,10 +200,14 @@ class _DataPageState extends State<DataPage> {
                     item['zamanDamgasi'],
                     fields: updatedFields,
                   );
+                  // Context'i async işlem sonrası kullanmadan önce kontrol et
+                  if (!mounted) return;
                   Navigator.of(context).pop();
                   getData();
                   Fluttertoast.showToast(msg: 'Kayıt güncellendi.');
                 } catch (e) {
+                  // Context'i async işlem sonrası kullanmadan önce kontrol et
+                  if (!mounted) return;
                   Fluttertoast.showToast(msg: 'Güncelleme hatası: $e');
                 }
               },

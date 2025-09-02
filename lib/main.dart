@@ -5,7 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'data_page.dart';
 import 'functions.dart';
-import 'About.dart';
+import 'about.dart';
 import 'widgets/scanner_widget.dart';
 import 'services/data_service.dart';
 import 'models/settings.dart';
@@ -17,6 +17,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -32,11 +34,13 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+  
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  MyHomePageState createState() => MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class MyHomePageState extends State<MyHomePage> {
   final List<TextEditingController> barcodeControllers = [];
   final List<TextEditingController> descriptionControllers = [];
   TextEditingController timeStampController = TextEditingController();
@@ -294,11 +298,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         IconButton(
                           icon: Icon(Icons.share),
                           onPressed: () async {
-                            final UrlPreview =
+                            final urlPreview =
                                 'https://barisgrbz.github.io/scanxcel';
 
-                            await Share.share(
-                                'Hey Senin İçin Bulduğum Uygulamaya Bir Göz At!\n\n$UrlPreview');
+                            await SharePlus.instance.share(
+                                ShareParams(text: 'Hey Senin İçin Bulduğum Uygulamaya Bir Göz At!\n\n$urlPreview'));
                           },
                         ),
                       ],
@@ -375,7 +379,8 @@ class SquareButton extends StatelessWidget {
   final String buttonName;
   final Icon? icon;
 
-  SquareButton({
+  const SquareButton({
+    super.key,
     required this.color,
     required this.onPressed,
     required this.buttonName,

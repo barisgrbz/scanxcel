@@ -6,6 +6,9 @@
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="Barkod tarama ve Excel export uygulaması">
+  
+  <!-- Kamera izinleri için güvenlik politikaları -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; media-src 'self' blob:; connect-src 'self' blob:;">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -29,6 +32,13 @@
 </head>
 <body>
   <script>
+    // Kamera izinlerini kontrol et
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      console.log('Kamera API destekleniyor');
+    } else {
+      console.log('Kamera API desteklenmiyor');
+    }
+    
     window.addEventListener('load', function(ev) {
       // Download main.dart.js
       _flutter.loader.loadEntrypoint({

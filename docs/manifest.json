@@ -1,8 +1,12 @@
 {
     "name": "ScanXcel",
     "short_name": "ScanXcel",
-    "start_url": ".",
+    "start_url": "/scanxcel/",
     "display": "standalone",
+    "permissions": [
+        "camera",
+        "microphone"
+    ],
     "background_color": "#FFFFFF",
     "theme_color": "#0175C2",
     "description": "Barkod tarama ve Excel export uygulaması",
