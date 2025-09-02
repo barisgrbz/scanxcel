@@ -19,7 +19,12 @@ class ExcelService {
     final sheet = excel['Sheet1'];
     
     // Başlık satırını oluştur
-    final headers = <String>['ID', 'Barkod'];
+    final headers = <String>['ID'];
+    
+    // Dinamik barkod başlıklarını ekle
+    for (int i = 0; i < settings.barcodeFieldCount; i++) {
+      headers.add('Barkod ${i + 1}');
+    }
     
     // Dinamik açıklama başlıklarını ekle
     for (final title in settings.descriptionTitles) {
@@ -33,7 +38,6 @@ class ExcelService {
     for (final row in rows) {
       final values = <dynamic>[];
       values.add(row['id']);
-      values.add(row['barkod'] ?? '');
       
       // Dinamik alanları ekle
       final fieldsRaw = row['fields'];
@@ -49,7 +53,13 @@ class ExcelService {
         fields = fieldsRaw.cast<String, dynamic>();
       }
       
-      // Her açıklama başlığı için değer ekle
+      // Barkod alanlarını ekle
+      for (int i = 0; i < settings.barcodeFieldCount; i++) {
+        final barkodKey = 'Barkod ${i + 1}';
+        values.add(fields != null ? (fields[barkodKey] ?? '') : '');
+      }
+      
+      // Açıklama alanlarını ekle
       for (final title in settings.descriptionTitles) {
         values.add(fields != null ? (fields[title] ?? '') : '');
       }

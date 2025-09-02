@@ -296,14 +296,12 @@ class DataPageState extends State<DataPage> {
                             margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             child: ListTile(
                               title: Text(
-                                'Barkod: ${item['barkod'] ?? 'N/A'}',
+                                'ID: ${item['id']}',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  if (item['manuelDeger']?.isNotEmpty == true)
-                                    Text('Açıklama: ${item['manuelDeger']}'),
                                   _buildFields(fields),
                                   Text(
                                     'Tarih: ${item['zamanDamgasi'] ?? 'N/A'}',

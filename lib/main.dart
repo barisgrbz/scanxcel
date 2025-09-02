@@ -71,11 +71,20 @@ class MyHomePageState extends State<MyHomePage> {
       }
 
       final fields = <String, dynamic>{};
+      
+      // Barkod alanlarını ekle
+      for (int i = 0; i < barcodes.length; i++) {
+        final barkodKey = 'Barkod ${i + 1}';
+        fields[barkodKey] = barcodes[i];
+      }
+      
+      // Açıklama alanlarını ekle
       for (int i = 0; i < descriptions.length; i++) {
         final title = (i < _settings.descriptionTitles.length) ? _settings.descriptionTitles[i] : 'Açıklama ${i+1}';
         fields[title] = descriptions[i];
       }
-      await _dataService.save(barcodes.isEmpty ? '' : barcodes.first, descriptions.isEmpty ? '' : descriptions.first, timeStamp, fields: fields);
+      
+      await _dataService.save('', '', timeStamp, fields: fields);
 
       Fluttertoast.showToast(msg: 'Veriler kaydedildi.');
       setState(() {
