@@ -331,9 +331,13 @@ class DataPageState extends State<DataPage> {
                             }
                           }
                           
-                          return Card(
-                            margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            child: ListTile(
+                                  return Card(
+          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          elevation: 3,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: ListTile(
                               title: Text(
                                 'ID: ${item['id']}',
                                 style: TextStyle(fontWeight: FontWeight.bold),

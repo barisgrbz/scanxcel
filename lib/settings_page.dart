@@ -94,10 +94,20 @@ class _SettingsPageState extends State<SettingsPage> {
     _ensureDescTitleControllers(descCount);
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blueGrey,
-        title: const Text('Ayarlar'),
+        backgroundColor: const Color(0xFF2E3A59),
+        elevation: 0,
+        title: const Text(
+          'Ayarlar',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         actions: [
-          IconButton(onPressed: _save, icon: const Icon(Icons.save)),
+          IconButton(
+            onPressed: _save, 
+            icon: const Icon(Icons.save, color: Colors.white),
+          ),
         ],
       ),
       body: ListView(
@@ -106,7 +116,25 @@ class _SettingsPageState extends State<SettingsPage> {
           TextField(
             controller: _barcodeCount,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: 'Barkod alanı adedi', border: OutlineInputBorder()),
+            decoration: InputDecoration(
+              labelText: 'Barkod alanı adedi',
+              labelStyle: const TextStyle(color: Color(0xFF2E3A59)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(color: Color(0xFFE0E6ED)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(color: Color(0xFFE0E6ED)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(color: Color(0xFF2E3A59), width: 2),
+              ),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            ),
             onChanged: (_) => setState(() {}),
           ),
           const SizedBox(height: 12),

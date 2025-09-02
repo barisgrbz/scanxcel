@@ -11,6 +11,10 @@ import 'services/data_service.dart';
 import 'models/settings.dart';
 import 'services/settings_service.dart';
 import 'settings_page.dart';
+import 'utils/responsive_helper.dart';
+import 'widgets/modern_card.dart';
+import 'widgets/modern_input_field.dart';
+import 'widgets/modern_button.dart';
 
 void main() {
   runApp(MyApp());
@@ -138,11 +142,19 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 230, 230, 230),
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        backgroundColor: Colors.blueGrey,
+        backgroundColor: const Color(0xFF2E3A59),
+        elevation: 0,
         title: Center(
-          child: Text('ScanXcel'),
+          child: Text(
+            'ScanXcel',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 24,
+            ),
+          ),
         ),
         actions: [
           IconButton(
@@ -156,126 +168,184 @@ class MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(height: 16.0),
-              for (int i = 0; i < _settings.barcodeFieldCount; i++) ...[
-                TextField(
-                  controller: barcodeControllers[i],
-                  decoration: InputDecoration(
-                    fillColor: Colors.white,
-                    filled: true,
-                    labelText: 'Barkod/QR Kod ${i+1}',
-                    hintText: 'Barkod veya QR kod değerini girin',
-                    suffixIcon: _buildScannerIcon(context, targetIndex: i),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0),
+              body: LayoutBuilder(
+          builder: (context, constraints) {
+            final isMobile = ResponsiveHelper.isMobile(context);
+            final isTablet = ResponsiveHelper.isTablet(context);
+            final isDesktop = ResponsiveHelper.isDesktop(context);
+            
+            // Responsive layout için grid sistemi
+            final crossAxisCount = isMobile ? 1 : (isTablet ? 2 : 3);
+            final childAspectRatio = isMobile ? 1.2 : (isTablet ? 1.5 : 2.0);
+            
+            return SingleChildScrollView(
+              padding: ResponsiveHelper.getResponsivePadding(context),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(height: 16.0),
+                  
+                  // Barkod alanları
+                  if (isMobile) ...[
+                    // Mobile: Dikey layout
+                    for (int i = 0; i < _settings.barcodeFieldCount; i++) ...[
+                      ModernInputField(
+                        controller: barcodeControllers[i],
+                        labelText: 'Barkod/QR Kod ${i+1}',
+                        hintText: 'Barkod veya QR kod değerini girin',
+                        suffixIcon: _buildScannerIcon(context, targetIndex: i),
+                        isRequired: true,
+                      ),
+                      SizedBox(height: 16.0),
+                    ],
+                  ] else ...[
+                    // Tablet/Desktop: Grid layout
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: crossAxisCount,
+                        childAspectRatio: childAspectRatio,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                      ),
+                      itemCount: _settings.barcodeFieldCount,
+                      itemBuilder: (context, i) {
+                        return ModernCard(
+                          child: ModernInputField(
+                            controller: barcodeControllers[i],
+                            labelText: 'Barkod/QR Kod ${i+1}',
+                            hintText: 'Barkod veya QR kod değerini girin',
+                            suffixIcon: _buildScannerIcon(context, targetIndex: i),
+                            isRequired: true,
+                          ),
+                        );
+                      },
                     ),
-                  ),
-                ),
-                SizedBox(height: 16.0),
-              ],
-              SizedBox(height: 16.0),
-              for (int i = 0; i < _settings.descriptionFieldCount; i++) ...[
-                TextField(
-                  controller: descriptionControllers[i],
-                  decoration: InputDecoration(
-                    fillColor: Colors.white,
-                    filled: true,
-                    labelText: (i < _settings.descriptionTitles.length ? _settings.descriptionTitles[i] : 'Açıklama ${i+1}'),
-                    hintText: 'Bilgi girin',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0),
+                    SizedBox(height: 24.0),
+                  ],
+                  
+                  // Açıklama alanları
+                  if (isMobile) ...[
+                    // Mobile: Dikey layout
+                    for (int i = 0; i < _settings.descriptionFieldCount; i++) ...[
+                      ModernInputField(
+                        controller: descriptionControllers[i],
+                        labelText: (i < _settings.descriptionTitles.length ? _settings.descriptionTitles[i] : 'Açıklama ${i+1}'),
+                        hintText: 'Bilgi girin',
+                      ),
+                      SizedBox(height: 16.0),
+                    ],
+                  ] else ...[
+                    // Tablet/Desktop: Grid layout
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: crossAxisCount,
+                        childAspectRatio: childAspectRatio,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                      ),
+                      itemCount: _settings.descriptionFieldCount,
+                      itemBuilder: (context, i) {
+                        return ModernCard(
+                          child: ModernInputField(
+                            controller: descriptionControllers[i],
+                            labelText: (i < _settings.descriptionTitles.length ? _settings.descriptionTitles[i] : 'Açıklama ${i+1}'),
+                            hintText: 'Bilgi girin',
+                          ),
+                        );
+                      },
                     ),
-                  ),
-                ),
-                SizedBox(height: 16.0),
-              ],
-              SizedBox(height: 16.0),
-              TextField(
-                controller: timeStampController,
-                readOnly: true,
-                decoration: InputDecoration(
-                  labelText: 'Zaman Damgası',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Expanded(
-                      child: SquareButton(
-                        color: Colors.white,
-                        onPressed: saveData,
-                        buttonName: 'Kaydet',
-                        icon: Icon(Icons.save_alt_rounded, color: Colors.green),
+                    SizedBox(height: 24.0),
+                  ],
+                  
+                  // Zaman damgası
+                  if (isMobile) ...[
+                    ModernInputField(
+                      controller: timeStampController,
+                      labelText: 'Zaman Damgası',
+                      isReadOnly: true,
+                    ),
+                  ] else ...[
+                    ModernCard(
+                      child: ModernInputField(
+                        controller: timeStampController,
+                        labelText: 'Zaman Damgası',
+                        isReadOnly: true,
                       ),
                     ),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: SquareButton(
-                        color: Colors.white,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => DataPage()),
-                          );
-                        },
-                        buttonName: 'Kayıtları Görüntüle',
-                        icon: Icon(Icons.search_outlined, color: Colors.blue),
-                      ),
-                    ),
-                  ]),
-              SizedBox(height: 8),
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Expanded(
-                      child: SquareButton(
-                        color: Colors.white,
-                        onPressed: clearDatabase,
-                        buttonName: 'Barkodları Temizle',
-                        icon: Icon(Icons.delete_forever, color: Colors.red),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: SquareButton(
-                        color: Colors.white,
-                        onPressed: exportToExcel,
-                        buttonName: 'Excel\'e Aktar',
-                        icon: Icon(Icons.upload_file_rounded,
-                            color: Colors.greenAccent),
-                      ),
-                    ),
-                  ]),
-              SizedBox(height: 8),
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Expanded(
-                      child: SquareButton(
-                        color: Colors.white,
-                        onPressed: openExcelFile,
-                        buttonName: 'Excel\'i Göster',
-                        icon: Icon(
-                          Icons.info_outline,
-                          color: Colors.orange,
+                  ],
+                                    SizedBox(height: 24),
+                  
+                  // Butonlar
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Expanded(
+                          child: ModernButton(
+                            text: 'Kaydet',
+                            onPressed: saveData,
+                            icon: Icons.save_alt_rounded,
+                            backgroundColor: const Color(0xFF10B981),
+                          ),
                         ),
-                      ),
-                    ),
-                  ]),
-            ],
-          ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: ModernButton(
+                            text: 'Kayıtları Görüntüle',
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => DataPage()),
+                              );
+                            },
+                            icon: Icons.search_outlined,
+                            backgroundColor: const Color(0xFF3B82F6),
+                          ),
+                        ),
+                      ]),
+                  SizedBox(height: 8),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Expanded(
+                          child: ModernButton(
+                            text: 'Barkodları Temizle',
+                            onPressed: clearDatabase,
+                            icon: Icons.delete_forever,
+                            backgroundColor: const Color(0xFFEF4444),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: ModernButton(
+                            text: 'Excel\'e Aktar',
+                            onPressed: exportToExcel,
+                            icon: Icons.upload_file_rounded,
+                            backgroundColor: const Color(0xFF8B5CF6),
+                          ),
+                        ),
+                      ]),
+                  SizedBox(height: 8),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Expanded(
+                          child: ModernButton(
+                            text: 'Excel\'i Göster',
+                            onPressed: openExcelFile,
+                            icon: Icons.info_outline,
+                            backgroundColor: const Color(0xFFF59E0B),
+                          ),
+                        ),
+                      ]),
+                ],
+              ),
+            );
+          },
         ),
-      ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -399,38 +469,37 @@ class SquareButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints(
-        minHeight: 64,
-        maxHeight: 64,
-        minWidth: 128,
-        maxWidth: 128,
-      ),
+      height: 70,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
-          side: BorderSide(
-            color: Colors.grey,
-          ),
+          elevation: 4,
+          shadowColor: Colors.black26,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
+            borderRadius: BorderRadius.circular(16.0),
           ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (icon != null)
               Padding(
-                padding:
-                    EdgeInsets.only(right: 8),
+                padding: const EdgeInsets.only(right: 12),
                 child: icon!,
               ),
-            Text(
-              buttonName,
-              style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-              textAlign: TextAlign.center,
-              softWrap: true,
-              overflow: TextOverflow.fade,
+            Flexible(
+              child: Text(
+                buttonName,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),
