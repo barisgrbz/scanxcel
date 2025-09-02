@@ -26,12 +26,7 @@ echo 4. Build dosyalari docs klasorune kopyalaniyor...
 xcopy "build\web\*" "docs\" /E /I /H
 
 echo.
-echo 5. Base href guncelleniyor...
-powershell -Command "(Get-Content 'docs\index.html') -replace 'base href=\"/\"', 'base href=\"/scanxcel/\"' | Set-Content 'docs\index.html'"
-
-echo.
-echo 6. Start URL guncelleniyor...
-powershell -Command "(Get-Content 'docs\manifest.json') -replace '\"start_url\": \".\"', '\"start_url\": \"/scanxcel/\"' | Set-Content 'docs\manifest.json'"
+echo 5. Build tamamlandi - Base href ve start_url otomatik ayarlandi
 
 echo.
 echo ========================================

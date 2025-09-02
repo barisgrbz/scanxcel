@@ -27,16 +27,7 @@ Write-Host "4. Build dosyalari docs klasorune kopyalaniyor..." -ForegroundColor 
 Copy-Item "build\web\*" "docs\" -Recurse -Force
 
 Write-Host ""
-Write-Host "5. Base href guncelleniyor..." -ForegroundColor Yellow
-$indexContent = Get-Content "docs\index.html" -Raw
-$indexContent = $indexContent -replace 'base href="/"', 'base href="/scanxcel/"'
-Set-Content "docs\index.html" $indexContent
-
-Write-Host ""
-Write-Host "6. Start URL guncelleniyor..." -ForegroundColor Yellow
-$manifestContent = Get-Content "docs\manifest.json" -Raw
-$manifestContent = $manifestContent -replace '"start_url": "."', '"start_url": "/scanxcel/"'
-Set-Content "docs\manifest.json" $manifestContent
+Write-Host "5. Build tamamlandi - Base href ve start_url otomatik ayarlandi" -ForegroundColor Yellow
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Green
