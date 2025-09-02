@@ -1,5 +1,5 @@
 name: scanxcel
-description: Barkod Tara ve Excel'e Export Et
+description: "Barkod tarama ve Excel export uygulaması"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0-308.0.dev <4.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -30,23 +30,30 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_barcode_scanner: ^2.0.0
-  path_provider: ^2.0.5
-  sqflite: ^2.0.0+4
-  fluttertoast: ^8.0.8
-  excel: ^2.0.2
-  share_plus: ^2.2.0
-  cupertino_icons: ^1.0.2
-  flutter_launcher_icons: ^0.13.1
-  open_file_plus: ^3.4.1
+  path_provider: ^2.1.5
+  sqflite: ^2.4.2
+  fluttertoast: ^8.2.12
+  excel: ^2.1.0
+  share_plus: ^11.1.0
+  cupertino_icons: ^1.0.8
+  flutter_launcher_icons: ^0.14.4
+  open_file: ^3.5.10
   flutter_speed_dial: ^7.0.0
-  intl: ^0.17.0
-  permission_handler: ^10.4.3
-  
+  intl: ^0.20.2
+  permission_handler: ^12.0.1
+  mobile_scanner: ^3.5.6
+  shared_preferences: ^2.3.2
 
-flutter_icons:
+flutter_launcher_icons:
   android: "launcher_icon" 
   image_path: "assets/icons/icon.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icons/icon.png"
+  web:
+    generate: true
+    image_path: "assets/icons/icon.png"
+    background_color: "#FFFFFF"
+    theme_color: "#0175C2"
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -55,13 +62,7 @@ flutter_icons:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^5.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -77,7 +78,10 @@ flutter:
       - family: Roboto
         fonts:
           
-          - asset: assets\fonts\Roboto-Bold.ttf
+          - asset: assets/fonts/Roboto-Bold.ttf
+            weight: 700
+          - asset: assets/fonts/Roboto-Light.ttf
+            weight: 300
   
 
   # The following line ensures that the Material Icons font is

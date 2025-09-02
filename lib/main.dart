@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:scanxcel/notification.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:excel/excel.dart';
-import 'dart:io';
-import 'dart:async';
 import 'package:intl/intl.dart';
 import 'data_page.dart';
 import 'functions.dart';
 import 'About.dart';
-import 'social_media.dart';
+import 'widgets/scanner_widget.dart';
+import 'services/data_service.dart';
+import 'models/settings.dart';
+import 'services/settings_service.dart';
+import 'settings_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -23,7 +21,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ScanXcel',
-      theme: ThemeData(fontFamily: 'Roboto'),
+      theme: ThemeData(
+        fontFamily: 'Roboto',
+        primarySwatch: Colors.blueGrey,
+        useMaterial3: true,
+      ),
       home: MyHomePage(),
     );
   }
@@ -35,24 +37,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  TextEditingController barcodeController = TextEditingController();
-  TextEditingController manualInputController = TextEditingController();
+  final List<TextEditingController> barcodeControllers = [];
+  final List<TextEditingController> descriptionControllers = [];
   TextEditingController timeStampController = TextEditingController();
 
   late DateTime currentTime;
-
-  Future<void> scanBarcode() async {
-    String barcode = await FlutterBarcodeScanner.scanBarcode(
-      '#ff6666',
-      'İptal',
-      true,
-      ScanMode.BARCODE,
-    );
-
-    setState(() {
-      barcodeController.text = barcode;
-    });
-  }
+  final DataService _dataService = DataService();
+  final SettingsService _settingsService = SettingsService();
+  AppSettings _settings = AppSettings.defaultValues();
 
   void updateCurrentTime() {
     currentTime = DateTime.now();
@@ -62,62 +54,70 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void saveData() async {
-    updateCurrentTime();
-    String scannedBarcode = barcodeController.text;
-    String manualInput = manualInputController.text;
-    String timeStamp = timeStampController.text;
-
-    if (scannedBarcode.isEmpty && manualInput.isEmpty) {
-      Fluttertoast.showToast(
-          msg: 'Lütfen barkod tarayın veya manuel olarak bir değer girin.');
-      return;
-    }
-
-    final database = openDatabase(
-      join(await getDatabasesPath(), 'barkod_database.db'),
-      onCreate: (db, version) {
-        return db.execute(
-          'CREATE TABLE barkodlar(id INTEGER PRIMARY KEY AUTOINCREMENT, barkod TEXT, manuelDeger TEXT, zamanDamgasi TEXT)',
-        );
-      },
-      onUpgrade: (db, oldVersion, newVersion) {
-        if (oldVersion < newVersion) {
-          db.execute('ALTER TABLE barkodlar ADD COLUMN zamanDamgasi TEXT');
-        }
-      },
-      version: 2,
-    );
-
-    await database.then((db) async {
-      await db.insert(
-        'barkodlar',
-        {
-          'barkod': scannedBarcode,
-          'manuelDeger': manualInput,
-          'zamanDamgasi': timeStamp
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    });
-
-    Fluttertoast.showToast(msg: 'Veriler kaydedildi.');
-    setState(() {
-      barcodeController.clear();
-      manualInputController.clear();
+    try {
       updateCurrentTime();
-    });
+      final barcodes = barcodeControllers.map((c) => c.text.trim()).where((e)=>e.isNotEmpty).toList();
+      final descriptions = descriptionControllers.map((c) => c.text.trim()).toList();
+      String timeStamp = timeStampController.text;
+
+      if (barcodes.isEmpty && descriptions.every((e)=>e.isEmpty)) {
+        Fluttertoast.showToast(
+            msg: 'Lütfen barkod tarayın veya manuel olarak bir değer girin.');
+        return;
+      }
+
+      final fields = <String, dynamic>{};
+      for (int i = 0; i < descriptions.length; i++) {
+        final title = (i < _settings.descriptionTitles.length) ? _settings.descriptionTitles[i] : 'Açıklama ${i+1}';
+        fields[title] = descriptions[i];
+      }
+      await _dataService.save(barcodes.isEmpty ? '' : barcodes.first, descriptions.isEmpty ? '' : descriptions.first, timeStamp, fields: fields);
+
+      Fluttertoast.showToast(msg: 'Veriler kaydedildi.');
+      setState(() {
+        for (final c in barcodeControllers) { c.clear(); }
+        for (final c in descriptionControllers) { c.clear(); }
+        updateCurrentTime();
+      });
+    } catch (e) {
+      Fluttertoast.showToast(msg: 'Kaydetme hatası: $e');
+    }
   }
 
   @override
   void initState() {
     super.initState();
     updateCurrentTime();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final s = await _settingsService.load();
+    setState(() {
+      _settings = s;
+      _syncControllersWithSettings();
+    });
+  }
+
+  void _syncControllersWithSettings() {
+    while (barcodeControllers.length < _settings.barcodeFieldCount) {
+      barcodeControllers.add(TextEditingController());
+    }
+    while (barcodeControllers.length > _settings.barcodeFieldCount) {
+      barcodeControllers.removeLast().dispose();
+    }
+    while (descriptionControllers.length < _settings.descriptionFieldCount) {
+      descriptionControllers.add(TextEditingController());
+    }
+    while (descriptionControllers.length > _settings.descriptionFieldCount) {
+      descriptionControllers.removeLast().dispose();
+    }
   }
 
   @override
   void dispose() {
-    barcodeController.dispose();
-    manualInputController.dispose();
+    for (final c in barcodeControllers) { c.dispose(); }
+    for (final c in descriptionControllers) { c.dispose(); }
     timeStampController.dispose();
     super.dispose();
   }
@@ -150,40 +150,42 @@ class _MyHomePageState extends State<MyHomePage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(height: 16.0),
-              TextField(
-                controller: barcodeController,
-                decoration: InputDecoration(
-                  fillColor: Colors.white,
-                  filled: true,
-                  labelText: 'Barkod&Qr Tarat',
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.camera_alt_sharp),
-                    onPressed: scanBarcode,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0),
+              for (int i = 0; i < _settings.barcodeFieldCount; i++) ...[
+                TextField(
+                  controller: barcodeControllers[i],
+                  decoration: InputDecoration(
+                    fillColor: Colors.white,
+                    filled: true,
+                    labelText: 'Barkod/QR Kod ${i+1}',
+                    hintText: 'Barkod veya QR kod değerini girin',
+                    suffixIcon: _buildScannerIcon(context, targetIndex: i),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
                   ),
                 ),
-              ),
+                SizedBox(height: 16.0),
+              ],
               SizedBox(height: 16.0),
-              TextField(
-                controller: manualInputController,
-                decoration: InputDecoration(
-                  fillColor: Colors.white,
-                  filled: true,
-                  labelText: 'Açıklama',
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.border_color_outlined),
-                    onPressed: () {},
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0),
+              for (int i = 0; i < _settings.descriptionFieldCount; i++) ...[
+                TextField(
+                  controller: descriptionControllers[i],
+                  decoration: InputDecoration(
+                    fillColor: Colors.white,
+                    filled: true,
+                    labelText: (i < _settings.descriptionTitles.length ? _settings.descriptionTitles[i] : 'Açıklama ${i+1}'),
+                    hintText: 'Bilgi girin',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
                   ),
                 ),
-              ),
+                SizedBox(height: 16.0),
+              ],
               SizedBox(height: 16.0),
               TextField(
                 controller: timeStampController,
+                readOnly: true,
                 decoration: InputDecoration(
                   labelText: 'Zaman Damgası',
                   border: OutlineInputBorder(
@@ -277,7 +279,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: Image.asset('assets/icons/icon.png'),
                     ),
                     Text('ScanXcel', style: TextStyle(fontSize: 15)),
-                    Text('versiyon:1.0.3', style: TextStyle(fontSize: 8)),
+                    Text('versiyon:1.2', style: TextStyle(fontSize: 8)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -293,7 +295,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           icon: Icon(Icons.share),
                           onPressed: () async {
                             final UrlPreview =
-                                'https://play.google.com/store/apps/details?id=com.bimilyondunya.eventswork&pcampaignid=web_share';
+                                'https://barisgrbz.github.io/scanxcel';
 
                             await Share.share(
                                 'Hey Senin İçin Bulduğum Uygulamaya Bir Göz At!\n\n$UrlPreview');
@@ -307,34 +309,62 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: Icon(Icons.people_alt_rounded),
-              title: Text('Hakkımızda'),
+              title: Text('Hakkında'),
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AboutUsPage()),
+                  MaterialPageRoute(builder: (context) => AboutPage()),
                 );
               },
             ),
-            ListTile(
-              leading: Icon(Icons.social_distance_rounded),
-              title: Text('Sosyal Medya'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SocialMediaPage()),
-                );
-              },
-            ),
+
             ListTile(
               leading: Icon(Icons.app_settings_alt_rounded),
-              title: Text('Ayarlar & Destek'),
+              title: Text('Ayarlar'),
               onTap: () {
                 Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SettingsPage()),
+                ).then((value) {
+                  _loadSettings();
+                });
               },
             ),
           ],
         ),
       ),
+    );
+  }
+
+  void _showBarcodeScanner({required int targetIndex}) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            title: Text('Barkod/QR Kod Tarayıcı'),
+            backgroundColor: Colors.blueGrey,
+          ),
+          body: ScannerView(
+            onScanned: (code) {
+              setState(() {
+                if (targetIndex < barcodeControllers.length) {
+                  barcodeControllers[targetIndex].text = code;
+                }
+              });
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScannerIcon(BuildContext context, {required int targetIndex}) {
+    return IconButton(
+      icon: Icon(Icons.qr_code_scanner),
+      onPressed: () => _showBarcodeScanner(targetIndex: targetIndex),
     );
   }
 }
@@ -378,7 +408,7 @@ class SquareButton extends StatelessWidget {
             if (icon != null)
               Padding(
                 padding:
-                    EdgeInsets.only(right: 8), // Simge ile metin arasına boşluk
+                    EdgeInsets.only(right: 8),
                 child: icon!,
               ),
             Text(

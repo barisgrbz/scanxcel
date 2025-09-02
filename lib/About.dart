@@ -1,78 +1,184 @@
 import 'package:flutter/material.dart';
 
-class AboutUsPage extends StatelessWidget {
+class AboutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 230, 230, 230),
       appBar: AppBar(
         backgroundColor: Colors.blueGrey,
-        title: Text('Hakkımızda'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'ScanXcel',
-              style: Theme.of(context).textTheme.headline5,
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Misyonumuz, Siz değerli kullanıcılarımıza yüksek kaliteli ürünler ve hizmetler sunmaktır.',
-              style: Theme.of(context).textTheme.bodyText2,
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Ana Özellikler:\n\n'
-              '🔍 Barkod ve QR Kod Tarayıcı: ScanXcel, üstün teknolojisi sayesinde hızlı ve hassas bir şekilde barkodlarınızı ve QR kodlarınızı tarar. Ürünlerinizi anında kaydetmek veya bilgi toplamak artık daha basit.\n\n'
-              '📝 Manuel Bilgi Girişi: Ürün veya nesnelerinizin barkodunu tarayamıyorsanız, manuel olarak açıklama girebilirsiniz. Bilgi girişi kolay ve sezgisel bir şekilde gerçekleşir.\n\n'
-              '🗃️ Veri Yönetimi: ScanXcel, kaydettiğiniz verileri güvenli bir şekilde yönetmenizi sağlar. Taramalarınızı, manuel girişlerinizi ve tarihleri kolayca görüntüleyebilirsiniz.\n\n'
-              '📊 Excel\'e Aktar: Topladığınız verileri tek bir dokunuşla Excel dosyasına aktarabilirsiniz. Bu özellik sayesinde verilerinizi daha fazla analiz etmek veya paylaşmak çok daha basit hale gelir.\n\n'
-              '📂 Veri Tabanı Temizleme: İhtiyacınız olmayan verileri hızla temizlemek için veri tabanı temizleme seçeneği ile veri karmaşasından kurtulun.\n\n'
-              '🚀 Hızlı ve Basit Kullanım: ScanXcel, sezgisel arayüzü ve pratik kullanımıyla veri yönetimini karmaşık olmaktan çıkarır.\n\n'
-              '📲 Uygulama Paylaşımı: Arkadaşlarınızla ve iş arkadaşlarınızla uygulamayı paylaşarak daha verimli çalışmalarına yardımcı olun.',
-              style: Theme.of(context).textTheme.bodyText2,
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Değerlerimiz:',
-              style: Theme.of(context).textTheme.headline6,
-            ),
-            SizedBox(height: 8),
-            Text(
-              '- Kullanıcı memnuniyeti en üst önceliğimizdir.',
-              style: Theme.of(context).textTheme.bodyText2,
-            ),
-            Text(
-              '- Sürekli iyileşmeyi amaçlıyoruz.',
-              style: Theme.of(context).textTheme.bodyText2,
-            ),
-            Text(
-              '- Tüm eylemlerimizde dürüstlüğü ve bütünlüğü önemsiyoruz.',
-              style: Theme.of(context).textTheme.bodyText2,
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Kilometre Taşları',
-              style: Theme.of(context).textTheme.headline6,
-            ),
-            SizedBox(height: 8),
-            ListTile(
-              leading: Icon(Icons.check),
-              title:
-                  Text('Diyarbakırda ilk proje çalışmalarımız başladı, 2023'),
-            ),
-            ListTile(
-              leading: Icon(Icons.check),
-              title: Text(''),
-            ),
-            ListTile(
-              leading: Icon(Icons.check),
-              title: Text(''),
-            ),
-          ],
+        title: Center(
+          child: Text('Hakkında'),
         ),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: 32.0),
+              Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                ),
+                child: Icon(
+                  Icons.qr_code_scanner,
+                  size: 60,
+                  color: Colors.blueGrey,
+                ),
+              ),
+              SizedBox(height: 24.0),
+              Text(
+                'ScanXcel',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueGrey,
+                ),
+              ),
+              SizedBox(height: 8.0),
+              Text(
+                'Versiyon 1.2',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                ),
+              ),
+              SizedBox(height: 32.0),
+              Card(
+                elevation: 4,
+                child: Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Uygulama Hakkında',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueGrey,
+                        ),
+                      ),
+                      SizedBox(height: 16.0),
+                      Text(
+                        'ScanXcel, barkod ve QR kod tarama işlemlerinizi kolaylaştıran, '
+                        'verilerinizi Excel formatında dışa aktarmanızı sağlayan pratik bir uygulamadır.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          height: 1.5,
+                        ),
+                      ),
+                      SizedBox(height: 24.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildFeatureItem(
+                            Icons.qr_code_scanner,
+                            'Barkod Tarama',
+                            'Kamera ile hızlı tarama',
+                          ),
+                          _buildFeatureItem(
+                            Icons.table_chart,
+                            'Excel Export',
+                            'Verileri Excel\'e aktarma',
+                          ),
+                          _buildFeatureItem(
+                            Icons.settings,
+                            'Dinamik Ayarlar',
+                            'Özelleştirilebilir alanlar',
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 24.0),
+              Card(
+                elevation: 2,
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Özellikler',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueGrey,
+                        ),
+                      ),
+                      SizedBox(height: 16.0),
+                      _buildFeatureRow('📱 Mobil ve Web desteği'),
+                      _buildFeatureRow('📷 Kamera ile barkod tarama'),
+                      _buildFeatureRow('📊 Excel formatında veri export'),
+                      _buildFeatureRow('⚙️ Dinamik alan yapılandırması'),
+                      _buildFeatureRow('💾 Yerel veri saklama'),
+                      _buildFeatureRow('🔍 Gelişmiş arama özellikleri'),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 24.0),
+              Text(
+                '© 2024 ScanXcel. Tüm hakları saklıdır.',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[500],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeatureItem(IconData icon, String title, String description) {
+    return Column(
+      children: [
+        Icon(
+          icon,
+          size: 32,
+          color: Colors.blueGrey,
+        ),
+        SizedBox(height: 8.0),
+        Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+        ),
+        SizedBox(height: 4.0),
+        Text(
+          description,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[600],
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFeatureRow(String text) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        children: [
+          SizedBox(width: 8.0),
+          Text(
+            text,
+            style: TextStyle(fontSize: 14),
+          ),
+        ],
       ),
     );
   }
