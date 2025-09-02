@@ -16,6 +16,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   final TextEditingController _barcodeCount = TextEditingController(text: '1');
   final TextEditingController _descCount = TextEditingController(text: '1');
+  final List<TextEditingController> _barcodeTitles = [];
   final List<TextEditingController> _descTitles = [];
 
   @override
@@ -29,6 +30,12 @@ class _SettingsPageState extends State<SettingsPage> {
     _settings = s;
     _barcodeCount.text = s.barcodeFieldCount.toString();
     _descCount.text = s.descriptionFieldCount.toString();
+    
+    _barcodeTitles.clear();
+    for (final t in s.barcodeTitles) {
+      _barcodeTitles.add(TextEditingController(text: t));
+    }
+    
     _descTitles.clear();
     for (final t in s.descriptionTitles) {
       _descTitles.add(TextEditingController(text: t));
@@ -36,7 +43,16 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() => _loading = false);
   }
 
-  void _ensureTitleControllers(int count) {
+  void _ensureBarcodeTitleControllers(int count) {
+    while (_barcodeTitles.length < count) {
+      _barcodeTitles.add(TextEditingController(text: 'Barkod'));
+    }
+    while (_barcodeTitles.length > count) {
+      _barcodeTitles.removeLast().dispose();
+    }
+  }
+
+  void _ensureDescTitleControllers(int count) {
     while (_descTitles.length < count) {
       _descTitles.add(TextEditingController(text: 'Açıklama'));
     }
@@ -48,12 +64,18 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _save() async {
     final barcodeN = int.tryParse(_barcodeCount.text) ?? 1;
     final descN = int.tryParse(_descCount.text) ?? 1;
-    _ensureTitleControllers(descN);
-    final titles = _descTitles.take(descN).map((e) => e.text.trim().isEmpty ? 'Açıklama' : e.text.trim()).toList();
+    
+    _ensureBarcodeTitleControllers(barcodeN);
+    _ensureDescTitleControllers(descN);
+    
+    final barcodeTitles = _barcodeTitles.take(barcodeN).map((e) => e.text.trim().isEmpty ? 'Barkod' : e.text.trim()).toList();
+    final descTitles = _descTitles.take(descN).map((e) => e.text.trim().isEmpty ? 'Açıklama' : e.text.trim()).toList();
+    
     final s = AppSettings(
       barcodeFieldCount: barcodeN.clamp(1, 10),
       descriptionFieldCount: descN.clamp(0, 10),
-      descriptionTitles: titles,
+      barcodeTitles: barcodeTitles,
+      descriptionTitles: descTitles,
     );
     await _service.save(s);
     if (mounted) Navigator.pop(context, s);
@@ -66,8 +88,10 @@ class _SettingsPageState extends State<SettingsPage> {
         body: Center(child: CircularProgressIndicator()),
       );
     }
+    final barcodeCount = int.tryParse(_barcodeCount.text) ?? _settings.barcodeFieldCount;
     final descCount = int.tryParse(_descCount.text) ?? _settings.descriptionFieldCount;
-    _ensureTitleControllers(descCount);
+    _ensureBarcodeTitleControllers(barcodeCount);
+    _ensureDescTitleControllers(descCount);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blueGrey,
@@ -92,6 +116,16 @@ class _SettingsPageState extends State<SettingsPage> {
             decoration: const InputDecoration(labelText: 'Açıklama alanı adedi', border: OutlineInputBorder()),
             onChanged: (_) => setState(() {}),
           ),
+          const SizedBox(height: 12),
+          const Text('Barkod başlıkları'),
+          const SizedBox(height: 8),
+          for (int i = 0; i < barcodeCount; i++) ...[
+            TextField(
+              controller: _barcodeTitles[i],
+              decoration: InputDecoration(labelText: 'Başlık ${i + 1}', border: const OutlineInputBorder()),
+            ),
+            const SizedBox(height: 8),
+          ],
           const SizedBox(height: 12),
           const Text('Açıklama başlıkları'),
           const SizedBox(height: 8),

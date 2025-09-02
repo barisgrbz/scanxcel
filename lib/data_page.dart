@@ -3,6 +3,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 import 'services/data_service.dart';
+import 'services/settings_service.dart';
+import 'models/settings.dart';
 import 'dart:convert';
 
 class DataPage extends StatefulWidget {
@@ -18,11 +20,13 @@ class DataPageState extends State<DataPage> {
   bool isLoading = false;
   final TextEditingController searchController = TextEditingController();
   late final DataService _dataService;
+  late final SettingsService _settingsService;
 
   @override
   void initState() {
     super.initState();
     _dataService = DataService();
+    _settingsService = SettingsService();
     getData();
   }
 
@@ -92,20 +96,55 @@ class DataPageState extends State<DataPage> {
   Widget _buildFields(Map<String, dynamic>? fields) {
     if (fields == null || fields.isEmpty) return SizedBox.shrink();
     
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: fields.entries.map((e) {
-        if (e.value != null && e.value.toString().isNotEmpty) {
-          return Padding(
-            padding: EdgeInsets.only(bottom: 4),
-            child: Text(
-              '${e.key}: ${e.value}',
-              style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-            ),
-          );
+    // Ayarları yükle
+    final settings = _settingsService.load();
+    
+    return FutureBuilder<AppSettings>(
+      future: settings,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return SizedBox.shrink();
+        
+        final appSettings = snapshot.data!;
+        final orderedFields = <Widget>[];
+        
+        // Barkod alanlarını önce ekle
+        for (int i = 0; i < appSettings.barcodeFieldCount; i++) {
+          final title = (i < appSettings.barcodeTitles.length) ? appSettings.barcodeTitles[i] : 'Barkod ${i + 1}';
+          final value = fields[title]?.toString() ?? '';
+          if (value.isNotEmpty) {
+            orderedFields.add(
+              Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Text(
+                  '$title: $value',
+                  style: TextStyle(fontSize: 12, color: Colors.blue[700], fontWeight: FontWeight.w500),
+                ),
+              ),
+            );
+          }
         }
-        return SizedBox.shrink();
-      }).where((widget) => widget != SizedBox.shrink()).toList(),
+        
+        // Açıklama alanlarını ekle
+        for (final title in appSettings.descriptionTitles) {
+          final value = fields[title]?.toString() ?? '';
+          if (value.isNotEmpty) {
+            orderedFields.add(
+              Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Text(
+                  '$title: $value',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                ),
+              ),
+            );
+          }
+        }
+        
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: orderedFields,
+        );
+      },
     );
   }
 

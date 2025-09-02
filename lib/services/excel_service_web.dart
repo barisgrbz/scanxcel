@@ -23,7 +23,8 @@ class ExcelService {
     
     // Dinamik barkod başlıklarını ekle
     for (int i = 0; i < settings.barcodeFieldCount; i++) {
-      headers.add('Barkod ${i + 1}');
+      final title = (i < settings.barcodeTitles.length) ? settings.barcodeTitles[i] : 'Barkod ${i + 1}';
+      headers.add(title);
     }
     
     // Dinamik açıklama başlıklarını ekle
@@ -55,8 +56,10 @@ class ExcelService {
       
       // Barkod alanlarını ekle
       for (int i = 0; i < settings.barcodeFieldCount; i++) {
-        final barkodKey = 'Barkod ${i + 1}';
-        values.add(fields != null ? (fields[barkodKey] ?? '') : '');
+        final title = (i < settings.barcodeTitles.length) ? settings.barcodeTitles[i] : 'Barkod ${i + 1}';
+        final barkodValue = fields != null ? (fields[title] ?? '') : '';
+        print('DEBUG: Barkod $i: $title = $barkodValue'); // Debug log
+        values.add(barkodValue);
       }
       
       // Açıklama alanlarını ekle

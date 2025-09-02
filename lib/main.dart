@@ -74,8 +74,8 @@ class MyHomePageState extends State<MyHomePage> {
       
       // Barkod alanlarını ekle
       for (int i = 0; i < barcodes.length; i++) {
-        final barkodKey = 'Barkod ${i + 1}';
-        fields[barkodKey] = barcodes[i];
+        final title = (i < _settings.barcodeTitles.length) ? _settings.barcodeTitles[i] : 'Barkod ${i + 1}';
+        fields[title] = barcodes[i];
       }
       
       // Açıklama alanlarını ekle

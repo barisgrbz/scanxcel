@@ -1,7 +1,7 @@
 {
     "name": "ScanXcel",
     "short_name": "ScanXcel",
-    "start_url": "/scanxcel/",
+    "start_url": "/",
     "display": "standalone",
     "background_color": "#FFFFFF",
     "theme_color": "#0175C2",
