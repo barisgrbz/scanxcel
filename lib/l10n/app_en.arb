@@ -1,0 +1,95 @@
+{
+  "@@locale": "en",
+  "appTitle": "ScanXcel",
+  "saveButton": "Save",
+  "viewRecordsButton": "View Records",
+  "clearDatabaseButton": "Clear Barcodes",
+  "exportToExcelButton": "Export to Excel",
+  "showExcelButton": "Show Excel",
+  "settingsButton": "Settings",
+  "aboutButton": "About",
+  "notificationsButton": "Notifications",
+  "barcodeFieldLabel": "Barcode/QR Code {index}",
+  "@barcodeFieldLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "barcodeFieldHint": "Enter barcode or QR code value",
+  "defaultBarcodeLabel": "Barcode/QR Code {index}",
+  "@defaultBarcodeLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "defaultDescriptionLabel": "Description {index}",
+  "@defaultDescriptionLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "descriptionFieldLabel": "Description {index}",
+  "@descriptionFieldLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "descriptionFieldHint": "Enter information",
+  "timestampFieldLabel": "Timestamp",
+  "requiredField": " *",
+  "saveSuccessMessage": "Data saved successfully.",
+  "saveErrorMessage": "Save error: ",
+  "exportSuccessMessage": "Excel file downloaded.",
+  "exportErrorMessage": "Excel export error: ",
+  "clearSuccessMessage": "Database cleared.",
+  "clearErrorMessage": "Error: ",
+  "noDataMessage": "No saved data in database.",
+  "emptyFieldsMessage": "Please scan a barcode or enter a value manually.",
+  "settingsTitle": "Settings",
+  "barcodeFieldCountLabel": "Number of barcode fields",
+  "descriptionFieldCountLabel": "Number of description fields",
+  "barcodeTitlesLabel": "Barcode titles",
+  "descriptionTitlesLabel": "Description titles",
+  "titleLabel": "Title {index}",
+  "@titleLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "saveSettingsButton": "Save",
+  "loadingMessage": "Loading...",
+  "errorMessage": "An error occurred",
+  "successMessage": "Success",
+  "warningMessage": "Warning",
+  "infoMessage": "Information",
+  "languageSelection": "Language Selection",
+  "turkish": "Turkish",
+  "english": "English",
+  "version": "version",
+  "aboutAppTitle": "About Application",
+  "aboutDescription": "ScanXcel is a practical application that makes your barcode and QR code scanning operations easier and allows you to export your data in Excel format.",
+  "barcodeScanning": "Barcode Scanning",
+  "quickCameraScanning": "Quick camera scanning",
+  "excelExport": "Excel Export",
+  "exportDataToExcel": "Export data to Excel",
+  "dynamicSettings": "Dynamic Settings",
+  "customizableFields": "Customizable fields",
+  "features": "Features",
+  "mobileWebSupport": "📱 Mobile and Web support",
+  "cameraBarcodeScanning": "📷 Camera barcode scanning",
+  "excelDataExport": "📊 Excel format data export",
+  "dynamicFieldConfiguration": "⚙️ Dynamic field configuration",
+  "localDataStorage": "💾 Local data storage",
+  "advancedSearchFeatures": "🔍 Advanced search features",
+  "copyright": "© 2024 ScanXcel. All rights reserved."
+}

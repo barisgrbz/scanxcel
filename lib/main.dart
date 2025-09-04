@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:scanxcel/notification.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'data_page.dart';
 import 'functions.dart';
 import 'about.dart';
@@ -16,12 +19,42 @@ import 'widgets/modern_card.dart';
 import 'widgets/modern_input_field.dart';
 import 'widgets/modern_button.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('tr_TR', null);
+  await initializeDateFormatting('en_US', null);
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Locale _locale = const Locale('tr', 'TR');
+  final SettingsService _settingsService = SettingsService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLanguage();
+  }
+
+  Future<void> _loadLanguage() async {
+    final settings = await _settingsService.load();
+    setState(() {
+      _locale = Locale(settings.languageCode, settings.countryCode);
+    });
+  }
+
+  void _changeLanguage(Locale newLocale) {
+    setState(() {
+      _locale = newLocale;
+    });
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -32,13 +65,27 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blueGrey,
         useMaterial3: true,
       ),
-      home: MyHomePage(),
+      // Localization desteği
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('tr', 'TR'), // Türkçe
+        Locale('en', 'US'), // İngilizce
+      ],
+      locale: _locale, // Dinamik dil
+      home: MyHomePage(onLanguageChanged: _changeLanguage),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+  final Function(Locale) onLanguageChanged;
+  
+  const MyHomePage({super.key, required this.onLanguageChanged});
   
   @override
   MyHomePageState createState() => MyHomePageState();
@@ -53,6 +100,11 @@ class MyHomePageState extends State<MyHomePage> {
   final DataService _dataService = DataService();
   final SettingsService _settingsService = SettingsService();
   AppSettings _settings = AppSettings.defaultValues();
+  
+  // Loading states
+  bool _isSaving = false;
+  
+
 
   void updateCurrentTime() {
     currentTime = DateTime.now();
@@ -62,17 +114,23 @@ class MyHomePageState extends State<MyHomePage> {
   }
 
   void saveData() async {
+    if (_isSaving) return; // Prevent multiple calls
+    
     try {
+      setState(() {
+        _isSaving = true;
+      });
+      
       updateCurrentTime();
       final barcodes = barcodeControllers.map((c) => c.text.trim()).where((e)=>e.isNotEmpty).toList();
       final descriptions = descriptionControllers.map((c) => c.text.trim()).toList();
       String timeStamp = timeStampController.text;
 
-      if (barcodes.isEmpty && descriptions.every((e)=>e.isEmpty)) {
-        Fluttertoast.showToast(
-            msg: 'Lütfen barkod tarayın veya manuel olarak bir değer girin.');
-        return;
-      }
+              if (barcodes.isEmpty && descriptions.every((e)=>e.isEmpty)) {
+          Fluttertoast.showToast(
+              msg: AppLocalizations.of(context)!.emptyFieldsMessage);
+          return;
+        }
 
       final fields = <String, dynamic>{};
       
@@ -90,14 +148,18 @@ class MyHomePageState extends State<MyHomePage> {
       
       await _dataService.save('', '', timeStamp, fields: fields);
 
-      Fluttertoast.showToast(msg: 'Veriler kaydedildi.');
+      Fluttertoast.showToast(msg: AppLocalizations.of(context)!.saveSuccessMessage);
       setState(() {
         for (final c in barcodeControllers) { c.clear(); }
         for (final c in descriptionControllers) { c.clear(); }
         updateCurrentTime();
       });
     } catch (e) {
-      Fluttertoast.showToast(msg: 'Kaydetme hatası: $e');
+      Fluttertoast.showToast(msg: '${AppLocalizations.of(context)!.saveErrorMessage}$e');
+    } finally {
+      setState(() {
+        _isSaving = false;
+      });
     }
   }
 
@@ -133,9 +195,11 @@ class MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
+    // Dispose controllers
     for (final c in barcodeControllers) { c.dispose(); }
     for (final c in descriptionControllers) { c.dispose(); }
     timeStampController.dispose();
+    
     super.dispose();
   }
 
@@ -172,7 +236,6 @@ class MyHomePageState extends State<MyHomePage> {
           builder: (context, constraints) {
             final isMobile = ResponsiveHelper.isMobile(context);
             final isTablet = ResponsiveHelper.isTablet(context);
-            final isDesktop = ResponsiveHelper.isDesktop(context);
             
             // Responsive layout için grid sistemi
             final crossAxisCount = isMobile ? 1 : (isTablet ? 2 : 3);
@@ -183,7 +246,7 @@ class MyHomePageState extends State<MyHomePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   
                   // Barkod alanları
                   if (isMobile) ...[
@@ -191,12 +254,12 @@ class MyHomePageState extends State<MyHomePage> {
                     for (int i = 0; i < _settings.barcodeFieldCount; i++) ...[
                       ModernInputField(
                         controller: barcodeControllers[i],
-                        labelText: 'Barkod/QR Kod ${i+1}',
-                        hintText: 'Barkod veya QR kod değerini girin',
+                        labelText: AppLocalizations.of(context)!.defaultBarcodeLabel(i+1),
+                        hintText: AppLocalizations.of(context)!.barcodeFieldHint,
                         suffixIcon: _buildScannerIcon(context, targetIndex: i),
                         isRequired: true,
                       ),
-                      SizedBox(height: 16.0),
+                      const SizedBox(height: 16.0),
                     ],
                   ] else ...[
                     // Tablet/Desktop: Grid layout
@@ -214,15 +277,15 @@ class MyHomePageState extends State<MyHomePage> {
                         return ModernCard(
                           child: ModernInputField(
                             controller: barcodeControllers[i],
-                            labelText: 'Barkod/QR Kod ${i+1}',
-                            hintText: 'Barkod veya QR kod değerini girin',
-                            suffixIcon: _buildScannerIcon(context, targetIndex: i),
+                            labelText: AppLocalizations.of(context)!.defaultBarcodeLabel(i+1),
+                            hintText: AppLocalizations.of(context)!.barcodeFieldHint,
+                            suffixIcon: _buildScannerIcon(context, targetIndex: 0),
                             isRequired: true,
                           ),
                         );
                       },
                     ),
-                    SizedBox(height: 24.0),
+                    const SizedBox(height: 24.0),
                   ],
                   
                   // Açıklama alanları
@@ -231,10 +294,10 @@ class MyHomePageState extends State<MyHomePage> {
                     for (int i = 0; i < _settings.descriptionFieldCount; i++) ...[
                       ModernInputField(
                         controller: descriptionControllers[i],
-                        labelText: (i < _settings.descriptionTitles.length ? _settings.descriptionTitles[i] : 'Açıklama ${i+1}'),
-                        hintText: 'Bilgi girin',
+                        labelText: (i < _settings.descriptionTitles.length ? _settings.descriptionTitles[i] : AppLocalizations.of(context)!.defaultDescriptionLabel(i+1)),
+                        hintText: AppLocalizations.of(context)!.descriptionFieldHint,
                       ),
-                      SizedBox(height: 16.0),
+                      const SizedBox(height: 16.0),
                     ],
                   ] else ...[
                     // Tablet/Desktop: Grid layout
@@ -252,50 +315,51 @@ class MyHomePageState extends State<MyHomePage> {
                         return ModernCard(
                           child: ModernInputField(
                             controller: descriptionControllers[i],
-                            labelText: (i < _settings.descriptionTitles.length ? _settings.descriptionTitles[i] : 'Açıklama ${i+1}'),
-                            hintText: 'Bilgi girin',
+                            labelText: (i < _settings.descriptionTitles.length ? _settings.descriptionTitles[i] : AppLocalizations.of(context)!.defaultDescriptionLabel(i+1)),
+                            hintText: AppLocalizations.of(context)!.descriptionFieldHint,
                           ),
                         );
                       },
                     ),
-                    SizedBox(height: 24.0),
+                    const SizedBox(height: 24.0),
                   ],
                   
                   // Zaman damgası
                   if (isMobile) ...[
                     ModernInputField(
                       controller: timeStampController,
-                      labelText: 'Zaman Damgası',
+                      labelText: AppLocalizations.of(context)!.timestampFieldLabel,
                       isReadOnly: true,
                     ),
                   ] else ...[
                     ModernCard(
                       child: ModernInputField(
                         controller: timeStampController,
-                        labelText: 'Zaman Damgası',
+                        labelText: AppLocalizations.of(context)!.timestampFieldLabel,
                         isReadOnly: true,
                       ),
                     ),
                   ],
-                                    SizedBox(height: 24),
+                                    const SizedBox(height: 24),
                   
                   // Butonlar
                   Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
                         Expanded(
-                          child: ModernButton(
-                            text: 'Kaydet',
-                            onPressed: saveData,
-                            icon: Icons.save_alt_rounded,
-                            backgroundColor: const Color(0xFF10B981),
-                          ),
+                                                                        child: ModernButton(
+                         text: AppLocalizations.of(context)!.saveButton,
+                         onPressed: saveData,
+                         icon: Icons.save_alt_rounded,
+                        backgroundColor: const Color(0xFF10B981),
+                        isLoading: _isSaving,
+                      ),
                         ),
                         SizedBox(width: 8),
                         Expanded(
-                          child: ModernButton(
-                            text: 'Kayıtları Görüntüle',
-                            onPressed: () {
+                                                  child: ModernButton(
+                             text: AppLocalizations.of(context)!.viewRecordsButton,
+                             onPressed: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) => DataPage()),
@@ -312,7 +376,7 @@ class MyHomePageState extends State<MyHomePage> {
                       children: <Widget>[
                         Expanded(
                           child: ModernButton(
-                            text: 'Barkodları Temizle',
+                            text: AppLocalizations.of(context)!.clearDatabaseButton,
                             onPressed: clearDatabase,
                             icon: Icons.delete_forever,
                             backgroundColor: const Color(0xFFEF4444),
@@ -320,10 +384,10 @@ class MyHomePageState extends State<MyHomePage> {
                         ),
                         SizedBox(width: 8),
                         Expanded(
-                          child: ModernButton(
-                            text: 'Excel\'e Aktar',
-                            onPressed: exportToExcel,
-                            icon: Icons.upload_file_rounded,
+                                                  child: ModernButton(
+                             text: AppLocalizations.of(context)!.exportToExcelButton,
+                             onPressed: exportToExcel,
+                             icon: Icons.upload_file_rounded,
                             backgroundColor: const Color(0xFF8B5CF6),
                           ),
                         ),
@@ -333,10 +397,10 @@ class MyHomePageState extends State<MyHomePage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Expanded(
-                          child: ModernButton(
-                            text: 'Excel\'i Göster',
-                            onPressed: openExcelFile,
-                            icon: Icons.info_outline,
+                                                  child: ModernButton(
+                             text: AppLocalizations.of(context)!.showExcelButton,
+                             onPressed: openExcelFile,
+                             icon: Icons.info_outline,
                             backgroundColor: const Color(0xFFF59E0B),
                           ),
                         ),
@@ -361,8 +425,8 @@ class MyHomePageState extends State<MyHomePage> {
                       width: 200,
                       child: Image.asset('assets/icons/icon.png'),
                     ),
-                    Text('ScanXcel', style: TextStyle(fontSize: 15)),
-                    Text('versiyon:1.2', style: TextStyle(fontSize: 8)),
+                                         Text(AppLocalizations.of(context)!.appTitle, style: TextStyle(fontSize: 15)),
+                     Text('${AppLocalizations.of(context)!.version}:1.2', style: TextStyle(fontSize: 8)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -392,8 +456,8 @@ class MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: Icon(Icons.people_alt_rounded),
-              title: Text('Hakkında'),
-              onTap: () {
+               title: Text(AppLocalizations.of(context)!.aboutButton),
+               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => AboutPage()),
@@ -403,12 +467,12 @@ class MyHomePageState extends State<MyHomePage> {
 
             ListTile(
               leading: Icon(Icons.app_settings_alt_rounded),
-              title: Text('Ayarlar'),
-              onTap: () {
+               title: Text(AppLocalizations.of(context)!.settingsButton),
+               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SettingsPage()),
+                  MaterialPageRoute(builder: (context) => SettingsPage(onLanguageChanged: widget.onLanguageChanged)),
                 ).then((value) {
                   _loadSettings();
                 });

@@ -59,7 +59,7 @@ class ExcelService {
       for (int i = 0; i < settings.barcodeFieldCount; i++) {
         final title = (i < settings.barcodeTitles.length) ? settings.barcodeTitles[i] : 'Barkod ${i + 1}';
         final barkodValue = fields != null ? (fields[title] ?? '') : '';
-        print('DEBUG: Barkod $i: $title = $barkodValue'); // Debug log
+  
         values.add(barkodValue);
       }
       

@@ -1,0 +1,95 @@
+{
+  "@@locale": "tr",
+  "appTitle": "ScanXcel",
+  "saveButton": "Kaydet",
+  "viewRecordsButton": "Kayıtları Görüntüle",
+  "clearDatabaseButton": "Barkodları Temizle",
+  "exportToExcelButton": "Excel'e Aktar",
+  "showExcelButton": "Excel'i Göster",
+  "settingsButton": "Ayarlar",
+  "aboutButton": "Hakkında",
+  "notificationsButton": "Bildirimler",
+  "barcodeFieldLabel": "Barkod/QR Kod {index}",
+  "@barcodeFieldLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "barcodeFieldHint": "Barkod veya QR kod değerini girin",
+  "defaultBarcodeLabel": "Barkod/QR Kod {index}",
+  "@defaultBarcodeLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "defaultDescriptionLabel": "Açıklama {index}",
+  "@defaultDescriptionLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "descriptionFieldLabel": "Açıklama {index}",
+  "@descriptionFieldLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "descriptionFieldHint": "Bilgi girin",
+  "timestampFieldLabel": "Zaman Damgası",
+  "requiredField": " *",
+  "saveSuccessMessage": "Veriler kaydedildi.",
+  "saveErrorMessage": "Kaydetme hatası: ",
+  "exportSuccessMessage": "Excel dosyası indirildi.",
+  "exportErrorMessage": "Excel export hatası: ",
+  "clearSuccessMessage": "Veri tabanı temizlendi.",
+  "clearErrorMessage": "Hata: ",
+  "noDataMessage": "Veri tabanında kaydedilmiş veri bulunmuyor.",
+  "emptyFieldsMessage": "Lütfen barkod tarayın veya manuel olarak bir değer girin.",
+  "settingsTitle": "Ayarlar",
+  "barcodeFieldCountLabel": "Barkod alanı adedi",
+  "descriptionFieldCountLabel": "Açıklama alanı adedi",
+  "barcodeTitlesLabel": "Barkod başlıkları",
+  "descriptionTitlesLabel": "Açıklama başlıkları",
+  "titleLabel": "Başlık {index}",
+  "@titleLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "saveSettingsButton": "Kaydet",
+  "loadingMessage": "Yükleniyor...",
+  "errorMessage": "Bir hata oluştu",
+  "successMessage": "Başarılı",
+  "warningMessage": "Uyarı",
+  "infoMessage": "Bilgi",
+  "languageSelection": "Dil Seçimi",
+  "turkish": "Türkçe",
+  "english": "İngilizce",
+  "version": "versiyon",
+  "aboutAppTitle": "Uygulama Hakkında",
+  "aboutDescription": "ScanXcel, barkod ve QR kod tarama işlemlerinizi kolaylaştıran, verilerinizi Excel formatında dışa aktarmanızı sağlayan pratik bir uygulamadır.",
+  "barcodeScanning": "Barkod Tarama",
+  "quickCameraScanning": "Kamera ile hızlı tarama",
+  "excelExport": "Excel Export",
+  "exportDataToExcel": "Verileri Excel'e aktarma",
+  "dynamicSettings": "Dinamik Ayarlar",
+  "customizableFields": "Özelleştirilebilir alanlar",
+  "features": "Özellikler",
+  "mobileWebSupport": "📱 Mobil ve Web desteği",
+  "cameraBarcodeScanning": "📷 Kamera ile barkod tarama",
+  "excelDataExport": "📊 Excel formatında veri export",
+  "dynamicFieldConfiguration": "⚙️ Dinamik alan yapılandırması",
+  "localDataStorage": "💾 Yerel veri saklama",
+  "advancedSearchFeatures": "🔍 Gelişmiş arama özellikleri",
+  "copyright": "© 2024 ScanXcel. Tüm hakları saklıdır."
+}

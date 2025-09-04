@@ -40,10 +40,13 @@ dependencies:
   flutter_launcher_icons: ^0.14.4
   open_file: ^3.5.10
   flutter_speed_dial: ^7.0.0
-  intl: ^0.20.2
+  intl: ^0.19.0
   permission_handler: ^12.0.1
   mobile_scanner: ^3.5.6
   shared_preferences: ^2.3.2
+  flutter_localizations:
+    sdk: flutter
+  provider: ^6.1.2
 
 flutter_launcher_icons:
   android: "launcher_icon" 
@@ -64,6 +67,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  mockito: ^5.4.4
+  build_runner: ^2.4.8
+  integration_test:
+    sdk: flutter
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -73,6 +80,7 @@ dev_dependencies:
 
 
 flutter:
+  generate: true
   assets:
     - assets/icons/icon.png
   fonts:

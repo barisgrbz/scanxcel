@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -10,7 +11,7 @@ class AboutPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.blueGrey,
         title: Center(
-          child: Text('Hakkında'),
+          child: Text(AppLocalizations.of(context)!.aboutButton),
         ),
       ),
       body: SingleChildScrollView(
@@ -35,7 +36,7 @@ class AboutPage extends StatelessWidget {
               ),
               SizedBox(height: 24.0),
               Text(
-                'ScanXcel',
+                AppLocalizations.of(context)!.appTitle,
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -44,7 +45,7 @@ class AboutPage extends StatelessWidget {
               ),
               SizedBox(height: 8.0),
               Text(
-                'Versiyon 1.2',
+                '${AppLocalizations.of(context)!.version} 1.2',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.grey[600],
@@ -58,7 +59,7 @@ class AboutPage extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(
-                        'Uygulama Hakkında',
+                        AppLocalizations.of(context)!.aboutAppTitle,
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -67,8 +68,7 @@ class AboutPage extends StatelessWidget {
                       ),
                       SizedBox(height: 16.0),
                       Text(
-                        'ScanXcel, barkod ve QR kod tarama işlemlerinizi kolaylaştıran, '
-                        'verilerinizi Excel formatında dışa aktarmanızı sağlayan pratik bir uygulamadır.',
+                        AppLocalizations.of(context)!.aboutDescription,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16,
@@ -80,19 +80,22 @@ class AboutPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           _buildFeatureItem(
+                            context,
                             Icons.qr_code_scanner,
-                            'Barkod Tarama',
-                            'Kamera ile hızlı tarama',
+                            AppLocalizations.of(context)!.barcodeScanning,
+                            AppLocalizations.of(context)!.quickCameraScanning,
                           ),
                           _buildFeatureItem(
+                            context,
                             Icons.table_chart,
-                            'Excel Export',
-                            'Verileri Excel\'e aktarma',
+                            AppLocalizations.of(context)!.excelExport,
+                            AppLocalizations.of(context)!.exportDataToExcel,
                           ),
                           _buildFeatureItem(
+                            context,
                             Icons.settings,
-                            'Dinamik Ayarlar',
-                            'Özelleştirilebilir alanlar',
+                            AppLocalizations.of(context)!.dynamicSettings,
+                            AppLocalizations.of(context)!.customizableFields,
                           ),
                         ],
                       ),
@@ -108,7 +111,7 @@ class AboutPage extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(
-                        'Özellikler',
+                        AppLocalizations.of(context)!.features,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -116,19 +119,19 @@ class AboutPage extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 16.0),
-                      _buildFeatureRow('📱 Mobil ve Web desteği'),
-                      _buildFeatureRow('📷 Kamera ile barkod tarama'),
-                      _buildFeatureRow('📊 Excel formatında veri export'),
-                      _buildFeatureRow('⚙️ Dinamik alan yapılandırması'),
-                      _buildFeatureRow('💾 Yerel veri saklama'),
-                      _buildFeatureRow('🔍 Gelişmiş arama özellikleri'),
+                      _buildFeatureRow(AppLocalizations.of(context)!.mobileWebSupport),
+                      _buildFeatureRow(AppLocalizations.of(context)!.cameraBarcodeScanning),
+                      _buildFeatureRow(AppLocalizations.of(context)!.excelDataExport),
+                      _buildFeatureRow(AppLocalizations.of(context)!.dynamicFieldConfiguration),
+                      _buildFeatureRow(AppLocalizations.of(context)!.localDataStorage),
+                      _buildFeatureRow(AppLocalizations.of(context)!.advancedSearchFeatures),
                     ],
                   ),
                 ),
               ),
               SizedBox(height: 24.0),
               Text(
-                '© 2024 ScanXcel. Tüm hakları saklıdır.',
+                AppLocalizations.of(context)!.copyright,
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.grey[500],
@@ -141,7 +144,7 @@ class AboutPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFeatureItem(IconData icon, String title, String description) {
+  Widget _buildFeatureItem(BuildContext context, IconData icon, String title, String description) {
     return Column(
       children: [
         Icon(

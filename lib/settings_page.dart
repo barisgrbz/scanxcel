@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'models/settings.dart';
 import 'services/settings_service.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+  final Function(Locale)? onLanguageChanged;
+  
+  const SettingsPage({super.key, this.onLanguageChanged});
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -18,6 +21,9 @@ class _SettingsPageState extends State<SettingsPage> {
   final TextEditingController _descCount = TextEditingController(text: '1');
   final List<TextEditingController> _barcodeTitles = [];
   final List<TextEditingController> _descTitles = [];
+  
+  // Dil seçimi için
+  Locale _selectedLocale = const Locale('tr', 'TR');
 
   @override
   void initState() {
@@ -30,6 +36,9 @@ class _SettingsPageState extends State<SettingsPage> {
     _settings = s;
     _barcodeCount.text = s.barcodeFieldCount.toString();
     _descCount.text = s.descriptionFieldCount.toString();
+    
+    // Mevcut dil ayarını yükle
+    _selectedLocale = Locale(s.languageCode, s.countryCode);
     
     _barcodeTitles.clear();
     for (final t in s.barcodeTitles) {
@@ -76,8 +85,16 @@ class _SettingsPageState extends State<SettingsPage> {
       descriptionFieldCount: descN.clamp(0, 10),
       barcodeTitles: barcodeTitles,
       descriptionTitles: descTitles,
+      languageCode: _selectedLocale.languageCode,
+      countryCode: _selectedLocale.countryCode ?? 'TR',
     );
     await _service.save(s);
+    
+    // Dil değişikliğini ana sayfaya bildir
+    if (widget.onLanguageChanged != null) {
+      widget.onLanguageChanged!(Locale(s.languageCode, s.countryCode));
+    }
+    
     if (mounted) Navigator.pop(context, s);
   }
 
@@ -96,9 +113,9 @@ class _SettingsPageState extends State<SettingsPage> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF2E3A59),
         elevation: 0,
-        title: const Text(
-          'Ayarlar',
-          style: TextStyle(
+        title: Text(
+           AppLocalizations.of(context)!.settingsTitle,
+           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w600,
           ),
@@ -117,8 +134,8 @@ class _SettingsPageState extends State<SettingsPage> {
             controller: _barcodeCount,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
-              labelText: 'Barkod alanı adedi',
-              labelStyle: const TextStyle(color: Color(0xFF2E3A59)),
+               labelText: AppLocalizations.of(context)!.barcodeFieldCountLabel,
+               labelStyle: const TextStyle(color: Color(0xFF2E3A59)),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: const BorderSide(color: Color(0xFFE0E6ED)),
@@ -141,34 +158,87 @@ class _SettingsPageState extends State<SettingsPage> {
           TextField(
             controller: _descCount,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: 'Açıklama alanı adedi', border: OutlineInputBorder()),
+            decoration: InputDecoration(labelText: AppLocalizations.of(context)!.descriptionFieldCountLabel, border: const OutlineInputBorder()),
             onChanged: (_) => setState(() {}),
           ),
           const SizedBox(height: 12),
-          const Text('Barkod başlıkları'),
+          Text(AppLocalizations.of(context)!.barcodeTitlesLabel),
           const SizedBox(height: 8),
           for (int i = 0; i < barcodeCount; i++) ...[
             TextField(
               controller: _barcodeTitles[i],
-              decoration: InputDecoration(labelText: 'Başlık ${i + 1}', border: const OutlineInputBorder()),
+              decoration: InputDecoration(labelText: AppLocalizations.of(context)!.titleLabel(i + 1), border: const OutlineInputBorder()),
             ),
             const SizedBox(height: 8),
           ],
           const SizedBox(height: 12),
-          const Text('Açıklama başlıkları'),
+          Text(AppLocalizations.of(context)!.descriptionTitlesLabel),
           const SizedBox(height: 8),
           for (int i = 0; i < descCount; i++) ...[
             TextField(
               controller: _descTitles[i],
-              decoration: InputDecoration(labelText: 'Başlık ${i + 1}', border: const OutlineInputBorder()),
+              decoration: InputDecoration(labelText: AppLocalizations.of(context)!.titleLabel(i + 1), border: const OutlineInputBorder()),
             ),
             const SizedBox(height: 8),
           ],
           const SizedBox(height: 24),
+          
+          // Dil Seçimi
+          Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                                     Text(
+                     '🌍 ${AppLocalizations.of(context)!.languageSelection}',
+                     style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2E3A59),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                                                 child: RadioListTile<Locale>(
+                           title: Text('🇹🇷 ${AppLocalizations.of(context)!.turkish}'),
+                           value: const Locale('tr', 'TR'),
+                          groupValue: _selectedLocale,
+                          onChanged: (Locale? value) {
+                            setState(() {
+                              _selectedLocale = value!;
+                            });
+                          },
+                        ),
+                      ),
+                      Expanded(
+                                                 child: RadioListTile<Locale>(
+                           title: Text('🇺🇸 ${AppLocalizations.of(context)!.english}'),
+                           value: const Locale('en', 'US'),
+                          groupValue: _selectedLocale,
+                          onChanged: (Locale? value) {
+                            setState(() {
+                              _selectedLocale = value!;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          
+          const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: _save,
             icon: const Icon(Icons.save),
-            label: const Text('Kaydet'),
+             label: Text(AppLocalizations.of(context)!.saveSettingsButton),
           ),
         ],
       ),
