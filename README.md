@@ -1,4 +1,4 @@
-# ScanXcel 🚀
+﻿# ScanXcel 🚀
 
 **Modern, Responsive ve Cross-Platform** barkod tarama ve Excel export uygulaması
 
@@ -140,65 +140,57 @@ Android APK dosyası için [Releases](https://github.com/barisgrbz/scanxcel/rele
 - **Android SDK**: API Level 21+
 - **Java**: 17+
 
-### Kurulum Adımları
+### Kurulum
 ```bash
-# Repository'yi klonlayın
+# Repository klonlama
 git clone https://github.com/barisgrbz/scanxcel.git
 cd scanxcel
 
-# Bağımlılıkları yükleyin
+# Dependencies
 flutter pub get
 
-# Web için build alın
+# Localization generate
+flutter gen-l10n
+
+# Icon generation
+flutter packages pub run flutter_launcher_icons:main
+
+# Web build
 flutter build web --release
 
-# Otomatik docs güncelleme (Windows)
-build_web.bat
-
-# Otomatik docs güncelleme (PowerShell)
-.\build_web.ps1
-
-# Android için build alın
+# Android build
 flutter build apk --release
 ```
 
-## 🏗️ Teknik Detaylar
+## 📂 Proje Yapısı
 
-### 🏛️ **Mimari**
-- **Clean Architecture**: Service layer pattern ile temiz kod yapısı
-- **Platform-specific Services**: Web ve mobil için ayrı servisler
-- **State Management**: Provider pattern ile reactive UI
-- **Dependency Injection**: Service locator pattern
-
-### 📁 **Paket Yapısı**
 ```
 lib/
-├── main.dart                    # Ana uygulama
-├── models/                      # Data models
-│   ├── settings.dart           # Ayarlar modeli
-│   └── barcode_record.dart     # Barkod kayıt modeli
-├── services/                    # Business logic
-│   ├── data_service.dart       # Veri servisi interface
-│   ├── data_service_mobile.dart # Mobile implementasyon
-│   ├── data_service_web.dart   # Web implementasyon
-│   ├── excel_service.dart      # Excel servisi interface
+├── main.dart                   # Ana uygulama
+├── models/                     # Data models
+│   └── settings.dart          # Ayarlar modeli
+├── services/                   # Business logic
+│   ├── data_service.dart      # Veri servisi (factory)
+│   ├── data_service_mobile.dart # Mobile SQLite
+│   ├── data_service_web.dart  # Web LocalStorage
+│   ├── excel_service.dart     # Excel servisi (factory)
 │   ├── excel_service_mobile.dart # Mobile Excel
-│   ├── excel_service_web.dart  # Web Excel
-│   └── settings_service.dart   # Ayarlar servisi
-├── providers/                   # State management
-│   └── app_state_provider.dart # App state provider
-├── widgets/                     # Reusable widgets
-│   ├── modern_button.dart      # Modern buton
-│   ├── modern_input_field.dart # Modern input field
-│   ├── modern_card.dart        # Modern kart
-│   └── scanner_widget.dart     # Scanner widget
-├── utils/                       # Utility classes
+│   ├── excel_service_web.dart # Web Excel
+│   └── settings_service.dart  # Ayarlar servisi
+├── widgets/                    # Custom widgets
+│   ├── scanner_widget.dart    # Scanner factory
+│   ├── scanner_widget_mobile.dart # Mobile scanner
+│   ├── scanner_widget_web.dart # Web scanner
+│   ├── modern_card.dart       # Modern card widget
+│   ├── modern_input_field.dart # Modern input widget
+│   └── modern_button.dart     # Modern button widget
+├── l10n/                       # Localization
+│   ├── app_en.arb            # İngilizce çeviriler
+│   └── app_tr.arb            # Türkçe çeviriler
+├── utils/                      # Utilities
 │   ├── responsive_helper.dart  # Responsive helper
-│   └── error_handler.dart      # Error handling
-├── l10n/                        # Localization
-│   ├── app_en.arb             # İngilizce
-│   └── app_tr.arb             # Türkçe
-├── constants/                   # Constants
+│   └── error_handler.dart     # Error handler
+├── constants/                  # Constants
 │   └── app_constants.dart      # App constants
 └── pages/                       # UI Pages
     ├── about.dart              # Hakkında sayfası
@@ -330,17 +322,18 @@ flutter build apk --split-per-abi --release
 # Production build
 flutter build web --release
 
-# Otomatik docs güncelleme
-# Windows: build_web.bat
-# PowerShell: .\build_web.ps1
+# Build scripts
+./build_web.bat  # Windows
+./build_web.ps1  # PowerShell
+
+# Manuel build (eğer scriptler çalışmazsa)
+flutter build web --release
+cp -r build/web/* docs/
 ```
 
-### 📦 **Build Scripts**
-- **`build_web.bat`**: Windows batch script
-- **`build_web.ps1`**: PowerShell script
-- **Otomatik**: Base href ve start_url güncelleme
-- **GitHub Actions**: Automated deployment
-- **Quality Gates**: Test ve analysis checks
+### 📄 **Build Scripts**
+- **`build_web.bat`**: Windows için otomatik web build
+- **`build_web.ps1`**: PowerShell için otomatik web build
 
 ## 📄 Lisans
 
@@ -400,14 +393,12 @@ flutter test integration_test/
 
 ### 🚀 **Development Setup**
 ```bash
-# Dependencies
+# Clone repository
+git clone https://github.com/barisgrbz/scanxcel.git
+cd scanxcel
+
+# Install dependencies
 flutter pub get
-
-# Code generation
-flutter packages pub run build_runner build
-
-# Localization
-flutter gen-l10n
 
 # Testing
 flutter test
@@ -450,7 +441,3 @@ dart format .
 ---
 
 **ScanXcel** - Barkod tarama ve Excel export uygulaması
-
-
-
- 
