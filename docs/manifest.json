@@ -1,7 +1,7 @@
 {
     "name": "ScanXcel",
     "short_name": "ScanXcel",
-    "start_url": "/",
+    "start_url": "/scanxcel/",
     "display": "standalone",
     "background_color": "#FFFFFF",
     "theme_color": "#0175C2",
@@ -12,7 +12,7 @@
         "camera",
         "microphone"
     ],
-    "scope": "/",
+    "scope": "/scanxcel/",
     "categories": ["productivity", "utilities"],
     "icons": [
         {
