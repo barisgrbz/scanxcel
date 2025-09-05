@@ -23,48 +23,17 @@
 - 🔎 **Gelişmiş Arama**: Tüm alanlarda hızlı arama
 - 🌐 **Web Kamera Desteği**: Tarayıcıda tam kamera functionality
 
-### 🎨 **UI/UX Features**
-- 📱 **Responsive Design**: Mobile, Tablet ve Desktop için optimize
-- 🎭 **Modern Animations**: Smooth transitions ve loading states
-- 🌈 **Material Design 3**: Modern ve şık arayüz
-- 🎯 **Accessibility**: Screen reader desteği ve keyboard navigation
-- 🎨 **Custom Widgets**: ModernCard, ModernButton, ModernInputField
-- 🎭 **Loading States**: Interactive loading animations
-- 🎨 **Theme System**: Consistent color palette ve styling
-- 📱 **Touch Friendly**: Mobile-first design approach
-
-### 🚀 **Technical Features**
+### 🎨 **Teknik Özellikler**
+- 📱 **Responsive Design**: Mobile, Tablet, Desktop desteği
+- 🌐 **Multi-Language**: Türkçe/İngilizce dil desteği
 - 🏗️ **Clean Architecture**: Service layer pattern
-- 📦 **State Management**: Provider pattern ile reactive UI
-- 🌐 **Multi-Language**: Tam localization desteği (TR/EN)
-- 🔄 **Dynamic Language**: Runtime dil değişimi
-- 🌍 **Generated Localization**: Flutter intl ile otomatik çeviri
-- 🧪 **Testing**: Unit, Widget ve Integration testler
+- 🧪 **Testing**: Unit, Widget, Integration testler
 - 📱 **PWA**: Progressive Web App desteği
-- 🔧 **Error Handling**: Comprehensive error management
-- 📊 **Performance**: Optimized state management
-- 🎯 **Accessibility**: Screen reader ve keyboard navigation
 
-## 🌍 **Localization (Çok Dil Desteği)**
-
-### 🗣️ **Desteklenen Diller**
-- 🇹🇷 **Türkçe**: Ana dil, varsayılan
-- 🇺🇸 **İngilizce**: Tam çeviri desteği
-
-### ⚙️ **Localization Özellikleri**
-- 🔄 **Runtime Dil Değişimi**: Uygulama açıkken dil değiştirebilme
-- 💾 **Kalıcı Dil Ayarı**: Seçilen dil otomatik kaydedilir
-- 🎯 **Tam Çeviri**: Tüm UI metinleri, hata mesajları, butonlar
-- 📱 **Form Alanları**: Barkod, açıklama, zaman damgası etiketleri
-- 📄 **About Sayfası**: Tam lokalize içerik
-- ⚙️ **Ayarlar Sayfası**: Çok dilli ayar sayfası
-- 🌍 **Generated Code**: Flutter intl ile otomatik kod üretimi
-
-### 🛠️ **Nasıl Kullanılır**
-1. **Ayarlar** → **🌍 Dil Seçimi** bölümüne git
-2. **🇹🇷 Türkçe** veya **🇺🇸 English** seç
-3. **Kaydet** butonuna bas
-4. Uygulama anında seçilen dile döner! ✨
+## 🌍 **Dil Desteği**
+- 🇹🇷 **Türkçe**: Varsayılan
+- 🇺🇸 **İngilizce**: Tam çeviri
+- ⚙️ **Nasıl**: Ayarlar → Dil Seçimi
 
 ## 🌟 Platform Özellikleri
 
@@ -115,17 +84,13 @@ Android APK dosyası için [Releases](https://github.com/barisgrbz/scanxcel/rele
 - ✅ SQLite veritabanı
 - ✅ Excel export/import
 
-### 📊 **Platform Comparison**
+### 📊 **Platform Durumu**
 
-| Özellik | Web | Android | iOS |
-|---------|-----|---------|-----|
-| **Barkod Tarama** | ✅ Camera API | ✅ Native Camera | 🔄 Coming Soon |
-| **Excel Export** | ✅ Download | ✅ Share/Open | 🔄 Coming Soon |
-| **Data Storage** | ✅ LocalStorage | ✅ SQLite | 🔄 Coming Soon |
-| **Responsive** | ✅ Full Support | ✅ Native UI | 🔄 Coming Soon |
-| **Offline** | ✅ PWA | ✅ Native | 🔄 Coming Soon |
-| **🌍 Localization** | ✅ TR/EN Support | ✅ TR/EN Support | 🔄 Coming Soon |
-| **🔄 Language Switch** | ✅ Runtime | ✅ Runtime | 🔄 Coming Soon |
+| Platform | Durum | Özellikler |
+|----------|-------|------------|
+| **Web** | ✅ Canlı | Camera API, PWA, Responsive |
+| **Android** | ✅ Aktif | Native UI, SQLite, Full features |
+| **iOS** | 🔄 Planlanan | Geliştirme aşamasında |
 
 ## 📱 Mobil Uygulama Gereksinimleri
 
@@ -163,137 +128,22 @@ flutter build web --release
 flutter build apk --release
 ```
 
-## 📂 Proje Yapısı
+## 🔧 **Teknoloji Stack**
+- **Framework**: Flutter 3.35.2+, Dart 3.7.0+
+- **Database**: SQLite (Mobile), LocalStorage (Web)
+- **State**: Provider pattern
+- **UI**: Material Design 3, Responsive
+- **Localization**: TR/EN dil desteği
+- **Build**: Flutter CLI, GitHub Actions
 
-```
-lib/
-├── main.dart                   # Ana uygulama
-├── models/                     # Data models
-│   └── settings.dart          # Ayarlar modeli
-├── services/                   # Business logic
-│   ├── data_service.dart      # Veri servisi (factory)
-│   ├── data_service_mobile.dart # Mobile SQLite
-│   ├── data_service_web.dart  # Web LocalStorage
-│   ├── excel_service.dart     # Excel servisi (factory)
-│   ├── excel_service_mobile.dart # Mobile Excel
-│   ├── excel_service_web.dart # Web Excel
-│   └── settings_service.dart  # Ayarlar servisi
-├── widgets/                    # Custom widgets
-│   ├── scanner_widget.dart    # Scanner factory
-│   ├── scanner_widget_mobile.dart # Mobile scanner
-│   ├── scanner_widget_web.dart # Web scanner
-│   ├── modern_card.dart       # Modern card widget
-│   ├── modern_input_field.dart # Modern input widget
-│   └── modern_button.dart     # Modern button widget
-├── l10n/                       # Localization
-│   ├── app_en.arb            # İngilizce çeviriler
-│   └── app_tr.arb            # Türkçe çeviriler
-├── utils/                      # Utilities
-│   ├── responsive_helper.dart  # Responsive helper
-│   └── error_handler.dart     # Error handler
-├── constants/                  # Constants
-│   └── app_constants.dart      # App constants
-└── pages/                       # UI Pages
-    ├── about.dart              # Hakkında sayfası
-    ├── data_page.dart          # Veri listesi
-    ├── notification.dart       # Bildirimler
-    └── settings_page.dart      # Ayarlar
-```
 
-### 🔧 **Teknoloji Stack**
-- **Frontend**: Flutter 3.35.2+, Dart 3.7.0+
-- **Backend**: Platform-specific (SQLite/SharedPreferences)
-- **State Management**: Provider pattern
-- **Testing**: Flutter Test, Mockito, Integration Test
-- **Localization**: Flutter Intl (Türkçe/İngilizce)
-- **Build Tools**: Flutter CLI, GitHub Actions
-- **Code Quality**: Flutter Lints, Custom Constants
-- **Error Handling**: Centralized Error Handler
-- **Performance**: Optimized Widgets, Lazy Loading
-- **Architecture**: Clean Architecture, Service Layer Pattern
-
-### 🌍 **Localization Teknik Detayları**
-- **Desteklenen Diller**: Türkçe (TR), İngilizce (EN)
-- **Dosya Formatı**: ARB (Application Resource Bundle)
-- **Konum**: `lib/l10n/app_tr.arb`, `lib/l10n/app_en.arb`
-- **Durum**: ✅ Tam entegre edildi ve çalışıyor
-- **Generated Code**: `lib/flutter_gen/gen_l10n/app_localizations.dart`
-- **Kullanım**: `AppLocalizations.of(context)!.textKey` ile erişim
-
-**🎯 Aktif Özellikler:**
-- ✅ `MaterialApp`'te `localizationsDelegates` tanımlı
-- ✅ `supportedLocales` konfigüre edildi
-- ✅ Ayarlar sayfasında dil seçimi mevcut
-- ✅ Tüm UI metinleri `AppLocalizations` ile çevrildi
-- ✅ Runtime dil değişimi aktif
-- ✅ Kalıcı dil saklama çalışıyor
-
-## 📦 Kullanılan Paketler
-
-### 🔧 **Core Dependencies**
-- **path_provider**: Dosya yolu yönetimi
+## 📦 **Temel Paketler**
+- **mobile_scanner**: Barkod/QR tarama
+- **excel**: Excel dosya oluşturma
 - **sqflite**: SQLite veritabanı
-- **fluttertoast**: Bildirim mesajları
-- **excel**: Excel dosya işlemleri
-- **share_plus**: Dosya paylaşımı
-- **mobile_scanner**: Barkod tarama
-- **shared_preferences**: Ayarlar depolama
-- **intl**: Tarih formatlama ve localization
-- **flutter_localizations**: Multi-language framework support
+- **shared_preferences**: Ayarlar saklama
+- **flutter_localizations**: Çok dil desteği
 
-### 🎨 **UI/UX Dependencies**
-- **flutter_speed_dial**: Hızlı erişim menüsü
-- **cupertino_icons**: iOS tarzı ikonlar
-- **flutter_launcher_icons**: Uygulama ikonları
-
-### 🚀 **Development Dependencies**
-- **flutter_lints**: Code quality
-- **mockito**: Testing için mocking
-- **build_runner**: Code generation
-- **integration_test**: End-to-end testing
-- **flutter_test**: Unit ve widget testing
-- **flutter_localizations**: Multi-language support
-
-## 📝 Sürüm Geçmişi
-
-### 🚀 **v1.4 (Güncel) - Full Localization**
-- 🌍 **Complete Localization**: Tam çok dil desteği (TR/EN)
-- 🔄 **Runtime Language Switch**: Uygulama açıkken dil değişimi
-- 💾 **Persistent Language**: Dil ayarı kalıcı olarak saklanır
-- 🎯 **100% Translated**: Tüm UI metinleri, formlar, sayfalar
-- 🌍 **Generated Localization**: Flutter intl ile otomatik kod
-- ⚙️ **Multilingual Settings**: Çok dilli ayarlar sayfası
-- 📄 **Localized About**: Tam çevrilmiş hakkında sayfası
-- 🎨 **Dynamic Form Labels**: Çok dilli form etiketleri
-
-### 🎨 **v1.3**
-- ✨ **Modern UI/UX**: Material Design 3, smooth animations
-- 📱 **Responsive Design**: Mobile, Tablet, Desktop için optimize
-- 🎭 **Loading States**: Butonlarda loading animasyonları
-- 🏗️ **Clean Architecture**: Service layer pattern
-- 📦 **State Management**: Provider pattern ile reactive UI
-- 🧪 **Testing**: Unit, Widget ve Integration testler
-- 📚 **Code Quality**: Constants, error handling, utilities
-- 🎨 **Custom Widgets**: ModernCard, ModernButton, ModernInputField
-- 🔧 **Error Handling**: Centralized error management system
-- 📊 **Performance**: Optimized state management ve lazy loading
-- 🎯 **Accessibility**: Enhanced user experience
-
-### 🎨 **v1.2**
-- ✅ Web uygulaması GitHub Pages'te yayınlandı
-- ✅ Dinamik alan desteği eklendi
-- ✅ Kayıt düzenleme özelliği eklendi
-- ✅ Gelişmiş arama özelliği eklendi
-- ✅ Modern UI tasarımı
-- ✅ PWA desteği
-
-### 🔧 **v1.1**
-- ✅ Barkod tarama özelliği
-- ✅ Excel export/import
-- ✅ Temel veri yönetimi
-
-### 📱 **v1.0**
-- ✅ Temel uygulama yapısı
 
 ## 🚀 Deployment
 
@@ -348,67 +198,19 @@ Bu proje **GNU General Public License v3.0** (GPL v3) altında lisanslanmıştı
 
 Detaylar için [LICENSE](LICENSE) dosyasına bakın.
 
-## 🤝 Katkıda Bulunma
+## 🤝 **Katkıda Bulunma**
 
-### 📋 **Katkı Rehberi**
+1. Repository'yi fork edin
+2. Feature branch oluşturun: `git checkout -b feature/NewFeature`
+3. Değişikliklerinizi commit edin: `git commit -m 'Add NewFeature'`
+4. Branch'i push edin: `git push origin feature/NewFeature`
+5. Pull Request oluşturun
 
-1. **Fork yapın** - Repository'yi fork edin
-2. **Feature branch oluşturun** - `git checkout -b feature/AmazingFeature`
-3. **Kod yazın** - Feature'ı implement edin
-4. **Test edin** - Unit ve widget testleri çalıştırın
-5. **Code Quality** - `flutter analyze` ile kod kalitesini kontrol edin
-6. **Commit yapın** - `git commit -m 'Add some AmazingFeature'`
-7. **Push yapın** - `git push origin feature/AmazingFeature`
-8. **Pull Request oluşturun** - GitHub'da PR açın
-
-### 🎯 **Katkı Alanları**
-- 🧪 **Testing**: Unit test coverage artırma
-- 🎨 **UI/UX**: Design improvements
-- 📱 **Mobile**: Android/iOS specific features
-- 🌐 **Web**: PWA enhancements
-- 📚 **Documentation**: Code documentation
-- 🔧 **Performance**: Performance optimizations
-
-### 🧪 **Testing**
+**Test & Quality:**
 ```bash
-# Unit tests
-flutter test
-
-# Specific test file
-flutter test test/services/settings_service_test.dart
-
-# Test coverage
-flutter test --coverage
-
-# Integration tests
-flutter test integration_test/
-```
-
-### 📝 **Code Style**
-- **Dart**: `flutter analyze`
-- **Format**: `dart format .`
-- **Lint**: `flutter analyze --no-fatal-infos`
-- **Constants**: `lib/constants/app_constants.dart`
-- **Error Handling**: `lib/utils/error_handler.dart`
-- **Custom Widgets**: `lib/widgets/`
-
-### 🚀 **Development Setup**
-```bash
-# Clone repository
-git clone https://github.com/barisgrbz/scanxcel.git
-cd scanxcel
-
-# Install dependencies
-flutter pub get
-
-# Testing
-flutter test
-
-# Code analysis
-flutter analyze
-
-# Format code
-dart format .
+flutter test        # Unit tests
+flutter analyze     # Code quality
+dart format .       # Code formatting
 ```
 
 ## 📚 **Sürüm Geçmişi**
@@ -454,16 +256,12 @@ dart format .
 - 🌐 **Production Ready**: GitHub Pages deployment
 - 🐛 **Zero Critical Bugs**: Stable lifecycle management
 
----
-
-**ScanXcel v1.2** - Modern, Responsive ve Cross-Platform barkod tarama uygulaması 🚀
-
 ## 🙏 **Teşekkürler**
 
 ### 👥 **Katkıda Bulunanlar**
 - **[@ahmethakandinger](https://github.com/hakandinger)** - Proje ana yapısı destekleri için teşekkürler! 🚀
-- **Flutter Community** - Awesome framework ve packages
-- **ZXing Team** - Barcode scanning technology
+- **Flutter Community** - Framework ve packages için
+- **ZXing Team** - Barcode scanning teknolojisi
 
 ### 📞 **İletişim**
 - **GitHub**: [barisgrbz/scanxcel](https://github.com/barisgrbz/scanxcel)
