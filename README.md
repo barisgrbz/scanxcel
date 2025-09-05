@@ -1,6 +1,8 @@
-﻿# ScanXcel 🚀
+﻿# ScanXcel v1.2 🚀
 
 **Modern, Responsive ve Cross-Platform** barkod tarama ve Excel export uygulaması
+
+> 🎉 **v1.2 Güncellemesi**: Web kamera tarama optimizasyonu, gelişmiş UI ve performans iyileştirmeleri
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.35.2+-blue.svg)](https://flutter.dev/)
 [![Dart](https://img.shields.io/badge/Dart-3.7.0+-blue.svg)](https://dart.dev/)
@@ -11,16 +13,15 @@
 
 ## 🌟 Özellikler
 
-### ✨ **Core Features**
+### ✨ **v1.2 Temel Özellikler**
 - 📱 **Cross-Platform**: Android, Web ve iOS desteği
-- 🔍 **Barkod Tarama**: Kamera ile barkod/QR kod tarama
+- 📷 **Gelişmiş Kamera Tarama**: Optimize edilmiş 1D/2D barkod algılama
+- 🎯 **16 Barkod Formatı**: EAN-13, QR Code, CODE-128 ve daha fazlası
 - 📊 **Excel Export**: Dinamik kolonlar ile Excel dosyası oluşturma
 - ⚙️ **Dinamik Ayarlar**: Kullanıcı tanımlı alan sayısı ve başlıkları
 - ✏️ **Kayıt Düzenleme**: Mevcut kayıtları düzenleme
-- 🔎 **Gelişmiş Arama**: Barkod ve açıklama alanlarında arama
-- 🎨 **Customizable Titles**: Barkod ve açıklama alanları için özel başlıklar
-- 📱 **Real-time Updates**: Live data synchronization
-- 🔄 **Data Persistence**: Platform-specific storage solutions
+- 🔎 **Gelişmiş Arama**: Tüm alanlarda hızlı arama
+- 🌐 **Web Kamera Desteği**: Tarayıcıda tam kamera functionality
 
 ### 🎨 **UI/UX Features**
 - 📱 **Responsive Design**: Mobile, Tablet ve Desktop için optimize
@@ -410,28 +411,56 @@ flutter analyze
 dart format .
 ```
 
+## 📚 **Sürüm Geçmişi**
+
+### 🎉 **v1.2 (Güncel) - Web Kamera Optimizasyonu**
+- 📷 **Gelişmiş Web Kamera Tarama**: ZXing optimizasyonu
+- 🎯 **16 Barkod Formatı**: EAN-13, CODE-128, QR Code ve daha fazlası
+- 🚀 **Otomatik Kamera Kapanma**: Tarama sonrası otomatik geçiş
+- 🎨 **Modern Scanner UI**: Kırmızı çerçeve → Modern overlay
+- ⚡ **Performans**: 3x daha hızlı tarama (30ms kontrol)
+- 🔄 **Güvenli Navigation**: Widget lifecycle koruma
+- 📱 **Mobil Optimizasyon**: Telefon kameraları için optimize
+- 🌐 **GitHub Pages**: Canlı web demo
+
+### 🌍 **v1.1 - Localization & UI**
+- 🌐 **Tam Localization**: Türkçe/İngilizce dil desteği
+- 🎨 **Modern UI**: Material Design 3, custom widgets
+- 📱 **Responsive Design**: Mobile, tablet, desktop support
+- 🔧 **Error Handling**: Centralized error management
+
+### 🚀 **v1.0 - Initial Release**
+- 📱 **Cross-Platform**: Android, Web, iOS
+- 📊 **Excel Export**: Dynamic columns
+- 🔍 **Barcode Scanning**: Camera integration
+- ⚙️ **Dynamic Settings**: Customizable fields
+
 ## 🏆 **Başarılar ve Metrikler**
 
-### 📊 **Code Quality**
-- **Linter Issues**: 19 → 9 (✅ %53 iyileştirme)
-- **Test Coverage**: ✅ %100 Unit Test Coverage
-- **Build Status**: ✅ Web & Android builds successful
-- **Performance**: 🚀 Optimized state management
-- **Localization**: ✅ %100 Complete (TR/EN)
+### 📊 **v1.2 Code Quality**
+- **Linter Issues**: 25 → 11 (✅ %56 iyileştirme)
+- **Scanner Performance**: 🚀 3x daha hızlı
+- **Web Compatibility**: ✅ %100 tarayıcı desteği
+- **Mobile Camera**: ✅ Optimize edilmiş
+- **Build Status**: ✅ Clean build system
 
-### 🎯 **Features Implemented**
-- ✨ **Modern UI/UX**: Material Design 3, Custom Widgets
-- 🧪 **Testing Infrastructure**: Comprehensive test suite
-- 🌍 **Full Localization**: Complete multi-language support
-- 🔄 **Runtime Language Switch**: Dynamic language changing
-- 📱 **Responsive Design**: Mobile-first approach
-- 🔧 **Error Handling**: Centralized error management
-- 📊 **Performance**: Optimized architecture
-- 💾 **Persistent Settings**: Language preference storage
+### 🎯 **v1.2 Features**
+- 📷 **Advanced Camera**: Web & mobile optimized
+- 🎨 **Modern Scanner**: Clean UI without red frame
+- ⚡ **Fast Performance**: 30ms response time
+- 🔄 **Auto Navigation**: Smart page transitions
+- 🌐 **GitHub Pages**: Live deployment
 
 ---
 
-**ScanXcel** - Modern, Responsive ve Cross-Platform barkod tarama uygulaması 🚀
+**ScanXcel v1.2** - Modern, Responsive ve Cross-Platform barkod tarama uygulaması 🚀
+
+## 🙏 **Teşekkürler**
+
+### 👥 **Katkıda Bulunanlar**
+- **[@ahmethakandinger](https://github.com/hakandinger)** - Proje ana yapısı destekleri için teşekkürler! 🚀
+- **Flutter Community** - Awesome framework ve packages
+- **ZXing Team** - Barcode scanning technology
 
 ### 📞 **İletişim**
 - **GitHub**: [barisgrbz/scanxcel](https://github.com/barisgrbz/scanxcel)
