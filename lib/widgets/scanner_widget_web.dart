@@ -157,13 +157,8 @@ class _ScannerViewState extends State<ScannerView> {
       textColor: Colors.white,
     );
     
-    // Kısa bir gecikme sonra kapat
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        Navigator.of(context).pop();
-        widget.onScanned(code);
-      }
-    });
+    // Ana sayfaya callback gönder (ana sayfa Navigator.pop() yapacak)
+    widget.onScanned(code);
   }
 
   void _stopScanning() {

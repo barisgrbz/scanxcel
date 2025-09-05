@@ -497,6 +497,8 @@ class MyHomePageState extends State<MyHomePage> {
               });
               debugPrint('✅ Kod ${targetIndex + 1}. alana yazıldı: $code');
             }
+            // Scanner'dan ana sayfaya dön
+            Navigator.of(context).pop();
           },
         ),
       ),
