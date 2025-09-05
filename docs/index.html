@@ -8,7 +8,8 @@
   <meta name="description" content="Barkod tarama ve Excel export uygulaması">
   
   <!-- Kamera izinleri için güvenlik politikaları -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; media-src 'self' blob:; connect-src 'self' blob:;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https:; media-src 'self' blob: data: https:; connect-src 'self' blob: wss: https:;">
+  <meta http-equiv="Permissions-Policy" content="camera=*, microphone=*">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -22,16 +23,202 @@
 
   <title>ScanXcel</title>
   <link rel="manifest" href="manifest.json">
+  
+  <!-- ZXing Barcode Scanner Library -->
+  <script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
+  
+  <!-- Barcode Scanner JavaScript -->
+  <script>
+    let codeReader = null;
+    let selectedDeviceId = null;
+    let isScanning = false;
+    
+    // ZXing yüklendiğinde scanner'ı hazırla
+    function initializeScanner() {
+      if (typeof ZXing !== 'undefined') {
+        // Tek MultiFormat reader - hem 1D hem 2D destekliyor
+        codeReader = new ZXing.BrowserMultiFormatReader();
+        
+        console.log('🔧 ZXing MultiFormat scanner hazırlandı');
+      } else {
+        console.error('❌ ZXing yüklenemedi');
+      }
+    }
+    
+    // Kamera listesini al
+    async function getCameras() {
+      try {
+        const videoInputDevices = await codeReader.listVideoInputDevices();
+        console.log('📹 Bulunan kameralar:', videoInputDevices.length);
+        return videoInputDevices;
+      } catch (err) {
+        console.error('❌ Kamera listesi alınamadı:', err);
+        return [];
+      }
+    }
+    
+    // Gelişmiş kamera başlatma
+    async function setupCamera(videoElementId, deviceId = null) {
+      try {
+        const constraints = {
+          video: {
+            deviceId: deviceId ? { exact: deviceId } : undefined,
+            width: { ideal: 1280, min: 640 },
+            height: { ideal: 720, min: 480 },
+            facingMode: deviceId ? undefined : 'environment',
+            focusMode: 'continuous',
+            exposureMode: 'auto',
+            whiteBalanceMode: 'auto'
+          }
+        };
+        
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        const videoElement = document.getElementById(videoElementId);
+        
+        if (videoElement) {
+          videoElement.srcObject = stream;
+          console.log('🎥 Kamera stream başarıyla başlatıldı');
+          return stream;
+        }
+      } catch (err) {
+        console.error('❌ Kamera başlatma hatası:', err);
+        throw err;
+      }
+    }
+    
+    // Taramayı başlat
+    async function startScanning(videoElementId, deviceId = null) {
+      if (!codeReader || isScanning) return;
+      
+      try {
+        isScanning = true;
+        selectedDeviceId = deviceId;
+        
+        const result = await codeReader.decodeOnceFromVideoDevice(deviceId, videoElementId);
+        
+        if (result) {
+          console.log('Barkod tarandı:', result.text);
+          window.scannedResult = result.text;
+          stopScanning();
+          return result.text;
+        }
+      } catch (err) {
+        console.error('Tarama hatası:', err);
+        isScanning = false;
+      }
+    }
+    
+    // Sürekli tarama - Optimize edilmiş
+    async function startContinuousScanning(videoElementId, deviceId = null) {
+      if (!codeReader || isScanning) return;
+      
+      try {
+        isScanning = true;
+        selectedDeviceId = deviceId;
+        
+        // Tarama ayarlarını optimize et - 1D barkodlar için agresif
+        const hints = new Map();
+        hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
+        hints.set(ZXing.DecodeHintType.PURE_BARCODE, false);
+        hints.set(ZXing.DecodeHintType.ASSUME_GS1, false);
+        hints.set(ZXing.DecodeHintType.ALSO_INVERTED, true);
+        
+        // 1D barkodlar için özel ayarlar
+        hints.set(ZXing.DecodeHintType.ALLOWED_EAN_EXTENSIONS, [2, 5]);
+        hints.set(ZXing.DecodeHintType.ASSUME_CODE_39_CHECK_DIGIT, false);
+        hints.set(ZXing.DecodeHintType.RETURN_CODABAR_START_END, false);
+        
+        // Format önceliği: 1D barkodlar önce (EAN-13 gibi)
+        const allFormats = [
+          // Yaygın 1D ürün barkodları - öncelik
+          ZXing.BarcodeFormat.EAN_13,
+          ZXing.BarcodeFormat.EAN_8,
+          ZXing.BarcodeFormat.UPC_A,
+          ZXing.BarcodeFormat.UPC_E,
+          
+          // Esnek uzunluklu 1D barkodlar
+          ZXing.BarcodeFormat.CODE_128,
+          ZXing.BarcodeFormat.CODE_39,
+          ZXing.BarcodeFormat.CODE_93,
+          
+          // Diğer 1D formatlar
+          ZXing.BarcodeFormat.ITF,
+          ZXing.BarcodeFormat.CODABAR,
+          ZXing.BarcodeFormat.RSS_14,
+          ZXing.BarcodeFormat.RSS_EXPANDED,
+          
+          // 2D kodlar - sonra
+          ZXing.BarcodeFormat.QR_CODE,
+          ZXing.BarcodeFormat.DATA_MATRIX,
+          ZXing.BarcodeFormat.PDF_417,
+          ZXing.BarcodeFormat.AZTEC,
+          ZXing.BarcodeFormat.MAXICODE
+        ];
+        
+        hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, allFormats);
+        codeReader.hints = hints;
+        
+        console.log('📊 Aktif barkod formatları:', allFormats.length);
+        console.log('🎯 1D barkod öncelikli tarama (EAN-13, UPC, CODE-128)');
+        
+        // Tek MultiFormat tarama - 1D barkod odaklı
+        codeReader.decodeFromVideoDevice(deviceId, videoElementId, (result, err) => {
+          if (result && result.text) {
+            console.log('✅ Barkod tarandı:', result.text, 'Format:', result.format);
+            
+            // Format-specific debug
+            if (result.format === ZXing.BarcodeFormat.EAN_13) {
+              console.log('🏷️ EAN-13 ürün barkodu algılandı!');
+            } else if (result.format === ZXing.BarcodeFormat.CODE_128) {
+              console.log('📦 CODE-128 barkodu algılandı!');
+            } else if (result.format === ZXing.BarcodeFormat.UPC_A) {
+              console.log('🛒 UPC-A barkodu algılandı!');
+            }
+            
+            window.scannedResult = result.text;
+            stopScanning();
+          }
+          // Tarama hatalarını console'da göster
+          if (err && !(err instanceof ZXing.NotFoundException)) {
+            console.log('🔍 Tarama devam ediyor...');
+          }
+        });
+        
+        console.log('🎥 MultiFormat tarama başlatıldı');
+      } catch (err) {
+        console.error('❌ Sürekli tarama hatası:', err);
+        isScanning = false;
+      }
+    }
+    
+    // Taramayı durdur
+    function stopScanning() {
+      if (codeReader && isScanning) {
+        codeReader.reset();
+        isScanning = false;
+        console.log('🛑 Tarama durduruldu');
+      }
+    }
+    
+    // Sayfa yüklendiğinde scanner'ı hazırla
+    window.addEventListener('load', function() {
+      setTimeout(initializeScanner, 1000);
+    });
+  </script>
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = "2012610518";
+    const serviceWorkerVersion = "139987689";
   </script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
 </head>
 <body>
   <script>
+    // Global değişkenler
+    window.videoElement = null;
+    window.flutter_barcode_result = null;
+    
     // Kamera izinlerini kontrol et
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       console.log('Kamera API destekleniyor');

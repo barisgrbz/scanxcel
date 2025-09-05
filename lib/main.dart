@@ -279,7 +279,7 @@ class MyHomePageState extends State<MyHomePage> {
                             controller: barcodeControllers[i],
                             labelText: AppLocalizations.of(context)!.defaultBarcodeLabel(i+1),
                             hintText: AppLocalizations.of(context)!.barcodeFieldHint,
-                            suffixIcon: _buildScannerIcon(context, targetIndex: 0),
+                            suffixIcon: _buildScannerIcon(context, targetIndex: i),
                             isRequired: true,
                           ),
                         );
@@ -488,21 +488,16 @@ class MyHomePageState extends State<MyHomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => Scaffold(
-          appBar: AppBar(
-            title: Text('Barkod/QR Kod Tarayıcı'),
-            backgroundColor: Colors.blueGrey,
-          ),
-          body: ScannerView(
-            onScanned: (code) {
+        builder: (context) => ScannerView(
+          onScanned: (code) {
+            debugPrint('🎯 Ana sayfaya dönen kod: $code, targetIndex: $targetIndex');
+            if (targetIndex < barcodeControllers.length) {
               setState(() {
-                if (targetIndex < barcodeControllers.length) {
-                  barcodeControllers[targetIndex].text = code;
-                }
+                barcodeControllers[targetIndex].text = code;
               });
-              Navigator.of(context).pop();
-            },
-          ),
+              debugPrint('✅ Kod ${targetIndex + 1}. alana yazıldı: $code');
+            }
+          },
         ),
       ),
     );

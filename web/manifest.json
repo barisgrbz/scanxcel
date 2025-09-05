@@ -12,6 +12,8 @@
         "camera",
         "microphone"
     ],
+    "scope": "/",
+    "categories": ["productivity", "utilities"],
     "icons": [
         {
             "src": "icons/Icon-192.png",

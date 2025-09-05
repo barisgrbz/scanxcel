@@ -42,7 +42,7 @@ class ModernButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(borderRadius),
         boxShadow: isOutlined ? null : [
           BoxShadow(
-            color: (backgroundColor ?? const Color(0xFF2E3A59)).withOpacity(0.3),
+            color: (backgroundColor ?? const Color(0xFF2E3A59)).withValues(alpha: 0.3),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
