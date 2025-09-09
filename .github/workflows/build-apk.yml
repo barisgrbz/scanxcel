@@ -44,23 +44,29 @@ jobs:
           name: scanxcel-apk
           path: build/app/outputs/flutter-apk/app-release.apk
           
+      - name: Get version from pubspec.yaml
+        id: get_version
+        run: echo "VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)" >> $GITHUB_OUTPUT
+        
       - name: Create Release
-        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           files: build/app/outputs/flutter-apk/app-release.apk
-          name: Release ${{ github.ref_name }}
+          name: Release v${{ steps.get_version.outputs.VERSION }}
+          tag_name: v${{ steps.get_version.outputs.VERSION }}
           body: |
-            ## ScanXcel ${{ github.ref_name }}
+            ## ScanXcel v${{ steps.get_version.outputs.VERSION }}
             
             ### 📱 APK Download
-            - **scanxcel-${{ github.ref_name }}.apk** - Android APK file
+            - **scanxcel-v${{ steps.get_version.outputs.VERSION }}.apk** - Android APK file
             
             ### 🚀 Features
             - Advanced barcode scanning
             - Excel export functionality
             - Cross-platform support
             - Modern UI/UX
+            - Mobile update checker system
+            - Web APK download button
             
             ### 📋 Installation
             1. Download the APK file
