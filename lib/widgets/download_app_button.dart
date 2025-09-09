@@ -4,7 +4,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'dart:html' as html if (dart.library.html);
 
 class DownloadAppButton extends StatefulWidget {
   const DownloadAppButton({super.key});
@@ -145,17 +144,8 @@ class _DownloadAppButtonState extends State<DownloadAppButton> {
 
     try {
       if (kIsWeb) {
-        // Web'de direkt indirme
-        final response = await http.get(Uri.parse(_downloadUrl!));
-        if (response.statusCode == 200) {
-          // Blob oluştur ve indir
-          final blob = html.Blob([response.bodyBytes]);
-          final url = html.Url.createObjectUrlFromBlob(blob);
-          final anchor = html.AnchorElement(href: url)
-            ..setAttribute('download', 'scanxcel-v1.3.apk')
-            ..click();
-          html.Url.revokeObjectUrl(url);
-        }
+        // Web'de direkt indirme - dart:html kullanmadan
+        await launchUrl(Uri.parse(_downloadUrl!));
       } else {
         // Mobil'de browser'da aç
         if (await canLaunchUrl(Uri.parse(_downloadUrl!))) {
