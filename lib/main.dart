@@ -19,7 +19,7 @@ import 'utils/error_handler.dart';
 import 'widgets/modern_card.dart';
 import 'widgets/modern_input_field.dart';
 import 'widgets/modern_button.dart';
-// import 'widgets/download_app_button.dart'; // Geçici olarak devre dışı
+import 'widgets/download_app_button.dart';
 import 'widgets/update_dialog.dart';
 import 'services/update_checker.dart';
 
@@ -455,8 +455,8 @@ class MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                       ]),
-                  // Web'de APK indirme butonu (geçici olarak devre dışı)
-                  // if (kIsWeb) DownloadAppButton(),
+                  // Web'de APK indirme butonu
+                  if (kIsWeb) DownloadAppButton(),
                 ],
               ),
             );
