@@ -16,6 +16,7 @@ import 'services/settings_service.dart';
 import 'settings_page.dart';
 import 'utils/responsive_helper.dart';
 import 'utils/error_handler.dart';
+import 'utils/version_helper.dart';
 import 'widgets/modern_card.dart';
 import 'widgets/modern_input_field.dart';
 import 'widgets/modern_button.dart';
@@ -478,7 +479,7 @@ class MyHomePageState extends State<MyHomePage> {
                       child: Image.asset('assets/icons/icon.png'),
                     ),
                                          Text(AppLocalizations.of(context)!.appTitle, style: TextStyle(fontSize: 15)),
-                     Text('${AppLocalizations.of(context)!.version}:1.3', style: TextStyle(fontSize: 8)),
+                     Text('${AppLocalizations.of(context)!.version}:${VersionHelper.cachedVersion}', style: TextStyle(fontSize: 8)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [

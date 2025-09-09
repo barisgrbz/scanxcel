@@ -34,7 +34,7 @@ class _DownloadAppButtonState extends State<DownloadAppButton> {
         
         if (assets != null && assets.isNotEmpty) {
           final apkAsset = assets.firstWhere(
-            (asset) => asset['name'].toString().endsWith('.apk'),
+            (asset) => asset['name'].toString() == 'scanxcel.apk',
             orElse: () => null,
           );
           

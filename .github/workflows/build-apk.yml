@@ -48,17 +48,22 @@ jobs:
         id: get_version
         run: echo "VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)" >> $GITHUB_OUTPUT
         
+      - name: Rename APK file
+        run: |
+          cd build/app/outputs/flutter-apk
+          mv app-release.apk scanxcel.apk
+          
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: build/app/outputs/flutter-apk/app-release.apk
+          files: build/app/outputs/flutter-apk/scanxcel.apk
           name: Release v${{ steps.get_version.outputs.VERSION }}
           tag_name: v${{ steps.get_version.outputs.VERSION }}
           body: |
             ## ScanXcel v${{ steps.get_version.outputs.VERSION }}
             
             ### 📱 APK Download
-            - **scanxcel-v${{ steps.get_version.outputs.VERSION }}.apk** - Android APK file
+            - **scanxcel.apk** - Android APK file
             
             ### 🚀 Features
             - Advanced barcode scanning
