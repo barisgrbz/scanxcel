@@ -43,10 +43,22 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
         
+      - name: Copy build to docs folder
+        run: |
+          rm -rf docs
+          mkdir docs
+          cp -r build/web/* docs/
+          
+      - name: Update base href and manifest for docs deployment
+        run: |
+          sed -i 's|<base href="/">|<base href="/scanxcel/">|g' docs/index.html
+          sed -i 's|"start_url": "/"|"start_url": "/scanxcel/"|g' docs/manifest.json
+          sed -i 's|"scope": "/"|"scope": "/scanxcel/"|g' docs/manifest.json
+          
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './build/web'
+          path: './docs'
           
       - name: Deploy to GitHub Pages
         id: deployment

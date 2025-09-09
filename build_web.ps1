@@ -35,7 +35,18 @@ Write-Host "6. Build dosyalari docs klasorune kopyalaniyor..." -ForegroundColor 
 Copy-Item "build\web\*" "docs\" -Recurse -Force
 
 Write-Host ""
-Write-Host "7. Build tamamlandi - ScanXcel v1.3 hazir!" -ForegroundColor Yellow
+Write-Host "7. Base href ve manifest docs klasoru icin ayarlaniyor..." -ForegroundColor Yellow
+$indexContent = Get-Content "docs\index.html" -Raw
+$indexContent = $indexContent -replace '<base href="/">', '<base href="/scanxcel/">'
+Set-Content "docs\index.html" -Value $indexContent
+
+$manifestContent = Get-Content "docs\manifest.json" -Raw
+$manifestContent = $manifestContent -replace '"start_url": "/"', '"start_url": "/scanxcel/"'
+$manifestContent = $manifestContent -replace '"scope": "/"', '"scope": "/scanxcel/"'
+Set-Content "docs\manifest.json" -Value $manifestContent
+
+Write-Host ""
+Write-Host "8. Build tamamlandi - ScanXcel v1.3 hazir!" -ForegroundColor Yellow
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Green

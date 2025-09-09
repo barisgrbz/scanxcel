@@ -34,7 +34,13 @@ echo 6. Build dosyalari docs klasorune kopyalaniyor...
 xcopy "build\web\*" "docs\" /E /I /H
 
 echo.
-echo 7. Build tamamlandi - ScanXcel v1.3 hazir!
+echo 7. Base href ve manifest docs klasoru icin ayarlaniyor...
+powershell -Command "(Get-Content 'docs\index.html') -replace '<base href=\"/\">', '<base href=\"/scanxcel/\">' | Set-Content 'docs\index.html'"
+powershell -Command "(Get-Content 'docs\manifest.json') -replace '\"start_url\": \"/\"', '\"start_url\": \"/scanxcel/\"' | Set-Content 'docs\manifest.json'"
+powershell -Command "(Get-Content 'docs\manifest.json') -replace '\"scope\": \"/\"', '\"scope\": \"/scanxcel/\"' | Set-Content 'docs\manifest.json'"
+
+echo.
+echo 8. Build tamamlandi - ScanXcel v1.3 hazir!
 
 echo.
 echo ========================================

@@ -1,19 +1,20 @@
 {
-    "name": "ScanXcel",
+    "name": "ScanXcel v1.3 - Advanced Barcode Scanner",
     "short_name": "ScanXcel",
     "start_url": "/scanxcel/",
     "display": "standalone",
-    "background_color": "#FFFFFF",
-    "theme_color": "#0175C2",
-    "description": "Barkod tarama ve Excel export uygulaması",
+    "background_color": "#F5F7FA",
+    "theme_color": "#2E3A59",
+    "description": "Modern, responsive cross-platform barcode scanning and Excel export application with advanced features",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "permissions": [
-        "camera",
-        "microphone"
+        "camera"
     ],
     "scope": "/scanxcel/",
-    "categories": ["productivity", "utilities"],
+    "categories": ["productivity", "utilities", "business"],
+    "lang": "tr",
+    "dir": "ltr",
     "icons": [
         {
             "src": "icons/Icon-192.png",
