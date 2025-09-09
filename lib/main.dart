@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:scanxcel/notification.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
@@ -485,7 +486,13 @@ class MyHomePageState extends State<MyHomePage> {
                       children: [
                         IconButton(
                           icon: Icon(Icons.person),
-                          onPressed: () {},
+                          onPressed: () async {
+                            final url = 'https://github.com/barisgrbz';
+                            final uri = Uri.parse(url);
+                            if (await canLaunchUrl(uri)) {
+                              await launchUrl(uri, mode: LaunchMode.externalApplication);
+                            }
+                          },
                         ),
                         IconButton(
                           icon: Icon(Icons.mail),
