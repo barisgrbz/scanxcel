@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Build and Deploy ScanXcel v1.3 to GitHub Pages
 
 on:
   push:
@@ -15,14 +15,30 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  build-and-deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
+        
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
+          
+      - name: Install dependencies
+        run: flutter pub get
+        
+      - name: Generate localization files
+        run: flutter gen-l10n
+        
+      - name: Build web app
+        run: flutter build web --release
         
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -30,7 +46,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './docs'
+          path: './build/web'
           
       - name: Deploy to GitHub Pages
         id: deployment
