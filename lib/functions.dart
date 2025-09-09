@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'services/data_service.dart' if (dart.library.html) 'services/data_service.dart';
 import 'services/excel_service.dart' if (dart.library.html) 'services/excel_service.dart';
@@ -8,12 +6,9 @@ import 'utils/error_handler.dart';
 
 void clearDatabase() async {
   try {
-    final databasePath = await getDatabasesPath();
-    final database = await openDatabase(
-      join(databasePath, 'barkod_database.db'),
-    );
-
-    await database.delete('barkodlar');
+    // Platforma göre veri temizleme
+    final dataService = DataService();
+    await dataService.deleteAll();
     ErrorHandler.showClearSuccess();
   } catch (e) {
     ErrorHandler.showDataServiceError(e);
