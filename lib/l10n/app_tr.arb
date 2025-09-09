@@ -116,5 +116,16 @@
         "type": "String"
       }
     }
-  }
+  },
+  "downloadAppTitle": "Android Uygulamasını İndir",
+  "downloadAppDescription": "Daha iyi deneyim için mobil uygulamayı kullanın",
+  "downloadAppButton": "APK İndir",
+  "downloadAppNote": "APK dosyasını indirdikten sonra 'Bilinmeyen kaynaklardan yükleme' iznini etkinleştirin",
+  "updateAvailable": "Güncelleme Mevcut",
+  "currentVersion": "Mevcut Versiyon",
+  "latestVersion": "Son Versiyon",
+  "releaseNotes": "Güncelleme Notları",
+  "updateNote": "Güncelleme için APK dosyasını indirin ve yükleyin",
+  "later": "Daha Sonra",
+  "downloadUpdate": "Güncellemeyi İndir"
 }

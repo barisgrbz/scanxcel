@@ -45,7 +45,7 @@ class AboutPage extends StatelessWidget {
               ),
               SizedBox(height: 8.0),
               Text(
-                '${AppLocalizations.of(context)!.version} 1.2',
+                '${AppLocalizations.of(context)!.version} 1.3',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.grey[600],

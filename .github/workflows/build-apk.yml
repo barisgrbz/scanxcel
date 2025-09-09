@@ -1,0 +1,75 @@
+name: Build and Release APK
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
+          
+      - name: Install dependencies
+        run: flutter pub get
+        
+      - name: Generate localization files
+        run: flutter gen-l10n
+        
+      - name: Build APK
+        run: flutter build apk --release
+        
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: scanxcel-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/app/outputs/flutter-apk/app-release.apk
+          name: Release ${{ github.ref_name }}
+          body: |
+            ## ScanXcel ${{ github.ref_name }}
+            
+            ### 📱 APK Download
+            - **scanxcel-${{ github.ref_name }}.apk** - Android APK file
+            
+            ### 🚀 Features
+            - Advanced barcode scanning
+            - Excel export functionality
+            - Cross-platform support
+            - Modern UI/UX
+            
+            ### 📋 Installation
+            1. Download the APK file
+            2. Enable "Install from unknown sources" in Android settings
+            3. Install the APK file
+            
+            ### 🔗 Web Version
+            [Try the web version](https://barisgrbz.github.io/scanxcel/)
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

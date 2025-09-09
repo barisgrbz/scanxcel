@@ -116,5 +116,16 @@
         "type": "String"
       }
     }
-  }
+  },
+  "downloadAppTitle": "Download Android App",
+  "downloadAppDescription": "Use the mobile app for a better experience",
+  "downloadAppButton": "Download APK",
+  "downloadAppNote": "After downloading the APK file, enable 'Install from unknown sources' permission",
+  "updateAvailable": "Update Available",
+  "currentVersion": "Current Version",
+  "latestVersion": "Latest Version",
+  "releaseNotes": "Release Notes",
+  "updateNote": "Download and install the APK file to update",
+  "later": "Later",
+  "downloadUpdate": "Download Update"
 }

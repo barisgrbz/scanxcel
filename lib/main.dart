@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:scanxcel/notification.dart';
@@ -18,6 +19,11 @@ import 'utils/error_handler.dart';
 import 'widgets/modern_card.dart';
 import 'widgets/modern_input_field.dart';
 import 'widgets/modern_button.dart';
+// import 'widgets/download_app_button.dart'; // Geçici olarak devre dışı
+import 'widgets/update_dialog.dart';
+import 'services/update_checker.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,6 +47,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _loadLanguage();
+    _checkForUpdates();
   }
 
   Future<void> _loadLanguage() async {
@@ -48,6 +55,37 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       _locale = Locale(settings.languageCode, settings.countryCode);
     });
+  }
+
+  Future<void> _checkForUpdates() async {
+    // Sadece mobil platformlarda güncelleme kontrolü yap
+    if (!kIsWeb) {
+      try {
+        final updateInfo = await UpdateChecker.checkForUpdates();
+        if (updateInfo != null && updateInfo.hasUpdate) {
+          // Context'i almak için bir sonraki frame'de göster
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _showUpdateDialog(updateInfo);
+          });
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print('Update check failed: $e');
+        }
+      }
+    }
+  }
+
+  void _showUpdateDialog(UpdateInfo updateInfo) {
+    // Navigator context'i kontrol et
+    final context = navigatorKey.currentContext;
+    if (context != null) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => UpdateDialog(updateInfo: updateInfo),
+      );
+    }
   }
 
   void _changeLanguage(Locale newLocale) {
@@ -59,6 +97,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'ScanXcel',
       theme: ThemeData(
         fontFamily: 'Roboto',
@@ -416,6 +455,8 @@ class MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                       ]),
+                  // Web'de APK indirme butonu (geçici olarak devre dışı)
+                  // if (kIsWeb) DownloadAppButton(),
                 ],
               ),
             );
@@ -437,7 +478,7 @@ class MyHomePageState extends State<MyHomePage> {
                       child: Image.asset('assets/icons/icon.png'),
                     ),
                                          Text(AppLocalizations.of(context)!.appTitle, style: TextStyle(fontSize: 15)),
-                     Text('${AppLocalizations.of(context)!.version}:1.2', style: TextStyle(fontSize: 8)),
+                     Text('${AppLocalizations.of(context)!.version}:1.3', style: TextStyle(fontSize: 8)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [

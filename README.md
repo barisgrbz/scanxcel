@@ -254,14 +254,14 @@ dart format .       # Code formatting
 
 ## 🏆 **Başarılar ve Metrikler**
 
-### 📊 **Evolution Timeline (v1.0 → v1.2)**
+### 📊 **Evolution Timeline (v1.0 → v1.3)**
 - **Code Quality**: Linter Issues 50+ → 11 (✅ %78 iyileştirme)
 - **Scanner Performance**: Basic → 30ms tarama (🚀 Ultra-fast)
 - **UI Evolution**: Static → Modern responsive design
 - **Platform Support**: Android → Android + Web + iOS
 - **Camera Technology**: Simple → Advanced ZXing optimization
 
-### 🎯 **v1.2 Breakthrough Features**
+### 🎯 **v1.3 Breakthrough Features**
 - 📷 **Web Kamera Mastery**: Cross-browser camera optimization
 - 🎨 **Clean Scanner UI**: Aesthetic overlay design (red frame removed)
 - ⚡ **Lightning Performance**: 30ms real-time scanning
