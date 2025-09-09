@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:html' as html;
 import 'dart:ui_web' as ui;
 import 'dart:js' as js;
 import 'dart:async';
+import '../utils/error_handler.dart';
 
 class ScannerView extends StatefulWidget {
   final void Function(String code) onScanned;
@@ -57,7 +57,7 @@ class _ScannerViewState extends State<ScannerView> {
     } catch (e) {
       print('Kamera başlatma hatası: $e');
       setState(() {
-        _error = 'Kamera başlatılamadı: ${e.toString()}';
+        _error = 'Kamera başlatılamadı: ${ErrorHandler.getErrorMessage(e)}';
         _isLoading = false;
       });
     }
@@ -150,12 +150,7 @@ class _ScannerViewState extends State<ScannerView> {
     _stopScanning();
     
     // Başarı sesi efekti (opsiyonel)
-    Fluttertoast.showToast(
-      msg: '✅ Barkod tarandı: $code',
-      toastLength: Toast.LENGTH_SHORT,
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-    );
+    ErrorHandler.showSuccess('✅ Barkod tarandı: $code');
     
     // Ana sayfaya callback gönder (ana sayfa Navigator.pop() yapacak)
     widget.onScanned(code);

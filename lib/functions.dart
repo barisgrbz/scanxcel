@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'services/data_service.dart' if (dart.library.html) 'services/data_service.dart';
 import 'services/excel_service.dart' if (dart.library.html) 'services/excel_service.dart';
+import 'utils/error_handler.dart';
 
 void clearDatabase() async {
   try {
@@ -14,9 +14,9 @@ void clearDatabase() async {
     );
 
     await database.delete('barkodlar');
-    Fluttertoast.showToast(msg: 'Veri tabanı temizlendi.');
+    ErrorHandler.showClearSuccess();
   } catch (e) {
-    Fluttertoast.showToast(msg: 'Hata: $e');
+    ErrorHandler.showDataServiceError(e);
   }
 }
 
@@ -29,7 +29,7 @@ void exportToExcel() async {
     final List<Map<String, dynamic>> queryResult = await dataService.getAllDesc();
 
     if (queryResult.isEmpty) {
-      Fluttertoast.showToast(msg: 'Veri tabanında kaydedilmiş veri bulunmuyor.');
+      ErrorHandler.showNoDataWarning();
       return;
     }
 
@@ -37,7 +37,7 @@ void exportToExcel() async {
     final excelService = ExcelService();
     await excelService.exportAndOpen(queryResult);
   } catch (e) {
-    Fluttertoast.showToast(msg: 'Excel export hatası: $e');
+    ErrorHandler.showFileError(e);
   }
 }
 
@@ -54,7 +54,7 @@ void openExcelFile() async {
       isWeb = true;
     }
     if (isWeb) {
-      Fluttertoast.showToast(msg: 'Webde indirdiğiniz Excel dosyasını kullanın.');
+      ErrorHandler.showInfo('Webde indirdiğiniz Excel dosyasını kullanın.');
       return;
     }
 
@@ -70,7 +70,7 @@ void openExcelFile() async {
     }
 
     if (!targetDirectory.existsSync()) {
-      Fluttertoast.showToast(msg: 'Excel dosyası bulunamadı.');
+      ErrorHandler.showWarning('Excel dosyası bulunamadı.');
       return;
     }
 
@@ -78,12 +78,12 @@ void openExcelFile() async {
     final file = File(filePath);
     
     if (await file.exists()) {
-      Fluttertoast.showToast(msg: 'Excel dosyası bulundu. Dosya yöneticisinden açabilirsiniz.');
+      ErrorHandler.showInfo('Excel dosyası bulundu. Dosya yöneticisinden açabilirsiniz.');
     } else {
-      Fluttertoast.showToast(msg: 'Excel dosyası bulunamadı.');
+      ErrorHandler.showWarning('Excel dosyası bulunamadı.');
     }
   } catch (e) {
-    Fluttertoast.showToast(msg: 'Dosya açma hatası: $e');
+    ErrorHandler.showFileError(e);
   }
 }
 

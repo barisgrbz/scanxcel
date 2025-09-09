@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import '../utils/error_handler.dart';
 
 class ScannerView extends StatefulWidget {
   final void Function(String code) onScanned;
@@ -41,7 +41,7 @@ class _ScannerViewState extends State<ScannerView> {
           final value = barcode.rawValue;
           if (value != null && value.isNotEmpty) {
             _handled = true;
-            Fluttertoast.showToast(msg: 'Barkod tarandı: $value');
+            ErrorHandler.showSuccess('Barkod tarandı: $value');
             // Kamerayı durdurup sonra bildirim gönderelim
             await _controller.stop();
             widget.onScanned(value);

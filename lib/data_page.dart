@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'dart:async';
 
 import 'services/data_service.dart';
 import 'services/settings_service.dart';
 import 'models/settings.dart';
+import 'utils/error_handler.dart';
 import 'dart:convert';
 
 class DataPage extends StatefulWidget {
@@ -21,6 +22,7 @@ class DataPageState extends State<DataPage> {
   final TextEditingController searchController = TextEditingController();
   late final DataService _dataService;
   late final SettingsService _settingsService;
+  Timer? _debounceTimer;
 
   @override
   void initState() {
@@ -33,64 +35,76 @@ class DataPageState extends State<DataPage> {
   @override
   void dispose() {
     searchController.dispose();
+    _debounceTimer?.cancel();
     super.dispose();
   }
 
   Future<void> getData() async {
+    if (!mounted) return;
+    
     setState(() {
       isLoading = true;
     });
 
     try {
       final result = await _dataService.getAllDesc();
-      setState(() {
-        data = result;
-        filteredData = result;
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          data = result;
+          filteredData = result;
+          isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      Fluttertoast.showToast(msg: 'Veri yükleme hatası: $e');
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+        ErrorHandler.showDataServiceError(e);
+      }
     }
   }
 
   void filterData(String query) {
-    if (query.isEmpty) {
-      setState(() {
-        filteredData = data;
-      });
-    } else {
-      setState(() {
-        final q = query.toLowerCase();
-        filteredData = data.where((item) {
-          final barkod = item['barkod']?.toString().toLowerCase() ?? '';
-          final manuel = item['manuelDeger']?.toString().toLowerCase() ?? '';
-          bool match = barkod.contains(q) || manuel.contains(q);
-          
-          // Dinamik alanlarda da arama yap
-          final fieldsRaw = item['fields'];
-          if (!match && fieldsRaw != null) {
-            Map<String, dynamic>? fields;
-            if (fieldsRaw is String) {
-              try { fields = json.decode(fieldsRaw) as Map<String, dynamic>; } catch (_) {}
-            } else if (fieldsRaw is Map) {
-              fields = fieldsRaw.cast<String, dynamic>();
-            }
-            if (fields != null) {
-              for (final v in fields.values) {
-                if (v != null && v.toString().toLowerCase().contains(q)) { 
-                  match = true; 
-                  break; 
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      if (!mounted) return;
+      
+      if (query.isEmpty) {
+        setState(() {
+          filteredData = data;
+        });
+      } else {
+        setState(() {
+          final q = query.toLowerCase();
+          filteredData = data.where((item) {
+            final barkod = item['barkod']?.toString().toLowerCase() ?? '';
+            final manuel = item['manuelDeger']?.toString().toLowerCase() ?? '';
+            bool match = barkod.contains(q) || manuel.contains(q);
+            
+            // Dinamik alanlarda da arama yap
+            final fieldsRaw = item['fields'];
+            if (!match && fieldsRaw != null) {
+              Map<String, dynamic>? fields;
+              if (fieldsRaw is String) {
+                try { fields = json.decode(fieldsRaw) as Map<String, dynamic>; } catch (_) {}
+              } else if (fieldsRaw is Map) {
+                fields = fieldsRaw.cast<String, dynamic>();
+              }
+              if (fields != null) {
+                for (final v in fields.values) {
+                  if (v != null && v.toString().toLowerCase().contains(q)) { 
+                    match = true; 
+                    break; 
+                  }
                 }
               }
             }
-          }
-          return match;
-        }).toList();
-      });
-    }
+            return match;
+          }).toList();
+        });
+      }
+    });
   }
 
   Widget _buildFields(Map<String, dynamic>? fields) {
@@ -151,20 +165,28 @@ class DataPageState extends State<DataPage> {
   Future<void> deleteData(int id) async {
     try {
       await _dataService.deleteById(id);
-      Fluttertoast.showToast(msg: 'Veri silindi.');
-      getData();
+      if (mounted) {
+        ErrorHandler.showSuccess('Veri silindi.');
+        getData();
+      }
     } catch (e) {
-      Fluttertoast.showToast(msg: 'Silme hatası: $e');
+      if (mounted) {
+        ErrorHandler.showDataServiceError(e);
+      }
     }
   }
 
   Future<void> deleteAllData() async {
     try {
       await _dataService.deleteAll();
-      Fluttertoast.showToast(msg: 'Tüm veriler silindi.');
-      getData();
+      if (mounted) {
+        ErrorHandler.showClearSuccess();
+        getData();
+      }
     } catch (e) {
-      Fluttertoast.showToast(msg: 'Toplu silme hatası: $e');
+      if (mounted) {
+        ErrorHandler.showDataServiceError(e);
+      }
     }
   }
 
@@ -243,11 +265,11 @@ class DataPageState extends State<DataPage> {
                   if (!mounted) return;
                   Navigator.of(context).pop();
                   getData();
-                  Fluttertoast.showToast(msg: 'Kayıt güncellendi.');
+                  ErrorHandler.showSuccess('Kayıt güncellendi.');
                 } catch (e) {
                   // Context'i async işlem sonrası kullanmadan önce kontrol et
                   if (!mounted) return;
-                  Fluttertoast.showToast(msg: 'Güncelleme hatası: $e');
+                  ErrorHandler.showDataServiceError(e);
                 }
               },
               child: Text('Kaydet'),

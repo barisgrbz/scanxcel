@@ -46,4 +46,66 @@ class ResponsiveHelper {
     if (isTablet(context)) return tablet;
     return desktop;
   }
+
+  static double getResponsiveSpacing(BuildContext context, {
+    double mobile = 8.0,
+    double tablet = 12.0,
+    double desktop = 16.0,
+  }) {
+    if (isMobile(context)) return mobile;
+    if (isTablet(context)) return tablet;
+    return desktop;
+  }
+
+  static double getResponsiveElevation(BuildContext context, {
+    double mobile = 4.0,
+    double tablet = 6.0,
+    double desktop = 8.0,
+  }) {
+    if (isMobile(context)) return mobile;
+    if (isTablet(context)) return tablet;
+    return desktop;
+  }
+
+  static EdgeInsets getResponsiveMargin(BuildContext context, {
+    EdgeInsets? mobile,
+    EdgeInsets? tablet,
+    EdgeInsets? desktop,
+  }) {
+    if (isMobile(context)) {
+      return mobile ?? const EdgeInsets.all(8.0);
+    } else if (isTablet(context)) {
+      return tablet ?? const EdgeInsets.all(12.0);
+    } else {
+      return desktop ?? const EdgeInsets.all(16.0);
+    }
+  }
+
+  static int getResponsiveCrossAxisCount(BuildContext context, {
+    int mobile = 1,
+    int tablet = 2,
+    int desktop = 3,
+  }) {
+    if (isMobile(context)) return mobile;
+    if (isTablet(context)) return tablet;
+    return desktop;
+  }
+
+  static double getResponsiveChildAspectRatio(BuildContext context, {
+    double mobile = 1.2,
+    double tablet = 1.5,
+    double desktop = 2.0,
+  }) {
+    if (isMobile(context)) return mobile;
+    if (isTablet(context)) return tablet;
+    return desktop;
+  }
+
+  static bool shouldShowGridLayout(BuildContext context) {
+    return !isMobile(context);
+  }
+
+  static bool shouldShowVerticalLayout(BuildContext context) {
+    return isMobile(context);
+  }
 }

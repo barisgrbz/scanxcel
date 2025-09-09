@@ -3,7 +3,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:scanxcel/notification.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'data_page.dart';
@@ -15,6 +14,7 @@ import 'models/settings.dart';
 import 'services/settings_service.dart';
 import 'settings_page.dart';
 import 'utils/responsive_helper.dart';
+import 'utils/error_handler.dart';
 import 'widgets/modern_card.dart';
 import 'widgets/modern_input_field.dart';
 import 'widgets/modern_button.dart';
@@ -126,11 +126,10 @@ class MyHomePageState extends State<MyHomePage> {
       final descriptions = descriptionControllers.map((c) => c.text.trim()).toList();
       String timeStamp = timeStampController.text;
 
-              if (barcodes.isEmpty && descriptions.every((e)=>e.isEmpty)) {
-          Fluttertoast.showToast(
-              msg: AppLocalizations.of(context)!.emptyFieldsMessage);
-          return;
-        }
+      if (barcodes.isEmpty && descriptions.every((e)=>e.isEmpty)) {
+        ErrorHandler.showEmptyFieldsWarning(context: context);
+        return;
+      }
 
       final fields = <String, dynamic>{};
       
@@ -148,18 +147,24 @@ class MyHomePageState extends State<MyHomePage> {
       
       await _dataService.save('', '', timeStamp, fields: fields);
 
-      Fluttertoast.showToast(msg: AppLocalizations.of(context)!.saveSuccessMessage);
-      setState(() {
-        for (final c in barcodeControllers) { c.clear(); }
-        for (final c in descriptionControllers) { c.clear(); }
-        updateCurrentTime();
-      });
+      if (mounted) {
+        ErrorHandler.showSaveSuccess(context: context);
+        setState(() {
+          for (final c in barcodeControllers) { c.clear(); }
+          for (final c in descriptionControllers) { c.clear(); }
+          updateCurrentTime();
+        });
+      }
     } catch (e) {
-      Fluttertoast.showToast(msg: '${AppLocalizations.of(context)!.saveErrorMessage}$e');
+      if (mounted) {
+        ErrorHandler.showDataServiceError(e, context: context);
+      }
     } finally {
-      setState(() {
-        _isSaving = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+      }
     }
   }
 
@@ -171,11 +176,19 @@ class MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _loadSettings() async {
-    final s = await _settingsService.load();
-    setState(() {
-      _settings = s;
-      _syncControllersWithSettings();
-    });
+    try {
+      final s = await _settingsService.load();
+      if (mounted) {
+        setState(() {
+          _settings = s;
+          _syncControllersWithSettings();
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ErrorHandler.showError('Ayarlar yükleme hatası: ${ErrorHandler.getErrorMessage(e)}');
+      }
+    }
   }
 
   void _syncControllersWithSettings() {
@@ -234,12 +247,10 @@ class MyHomePageState extends State<MyHomePage> {
       ),
               body: LayoutBuilder(
           builder: (context, constraints) {
-            final isMobile = ResponsiveHelper.isMobile(context);
-            final isTablet = ResponsiveHelper.isTablet(context);
             
             // Responsive layout için grid sistemi
-            final crossAxisCount = isMobile ? 1 : (isTablet ? 2 : 3);
-            final childAspectRatio = isMobile ? 1.2 : (isTablet ? 1.5 : 2.0);
+            final crossAxisCount = ResponsiveHelper.getResponsiveCrossAxisCount(context);
+            final childAspectRatio = ResponsiveHelper.getResponsiveChildAspectRatio(context);
             
             return SingleChildScrollView(
               padding: ResponsiveHelper.getResponsivePadding(context),
@@ -249,7 +260,7 @@ class MyHomePageState extends State<MyHomePage> {
                   const SizedBox(height: 16.0),
                   
                   // Barkod alanları
-                  if (isMobile) ...[
+                  if (ResponsiveHelper.shouldShowVerticalLayout(context)) ...[
                     // Mobile: Dikey layout
                     for (int i = 0; i < _settings.barcodeFieldCount; i++) ...[
                       ModernInputField(
@@ -289,7 +300,7 @@ class MyHomePageState extends State<MyHomePage> {
                   ],
                   
                   // Açıklama alanları
-                  if (isMobile) ...[
+                  if (ResponsiveHelper.shouldShowVerticalLayout(context)) ...[
                     // Mobile: Dikey layout
                     for (int i = 0; i < _settings.descriptionFieldCount; i++) ...[
                       ModernInputField(
@@ -325,7 +336,7 @@ class MyHomePageState extends State<MyHomePage> {
                   ],
                   
                   // Zaman damgası
-                  if (isMobile) ...[
+                  if (ResponsiveHelper.shouldShowVerticalLayout(context)) ...[
                     ModernInputField(
                       controller: timeStampController,
                       labelText: AppLocalizations.of(context)!.timestampFieldLabel,

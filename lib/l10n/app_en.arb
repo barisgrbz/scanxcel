@@ -91,5 +91,30 @@
   "dynamicFieldConfiguration": "⚙️ Dynamic field configuration",
   "localDataStorage": "💾 Local data storage",
   "advancedSearchFeatures": "🔍 Advanced search features",
-  "copyright": "© 2024 ScanXcel. All rights reserved."
+  "copyright": "© 2024 ScanXcel. All rights reserved.",
+  "dataProcessingError": "Data Processing Error",
+  "connectionError": "Connection Error",
+  "cameraError": "Camera Error",
+  "fileProcessingError": "File Processing Error",
+  "permissionError": "Permission Error",
+  "dataDeleted": "Data deleted.",
+  "allDataDeleted": "All data deleted.",
+  "recordUpdated": "Record updated.",
+  "settingsLoadError": "Settings loading error: ",
+  "dataLoadError": "Data loading error: ",
+  "deleteError": "Delete error: ",
+  "bulkDeleteError": "Bulk delete error: ",
+  "updateError": "Update error: ",
+  "excelFileNotFound": "Excel file not found.",
+  "excelFileFound": "Excel file found. You can open it from file manager.",
+  "fileOpenError": "File opening error: ",
+  "useDownloadedExcel": "Use the Excel file you downloaded on the web.",
+  "barcodeScanned": "Barcode scanned: {code}",
+  "@barcodeScanned": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  }
 }

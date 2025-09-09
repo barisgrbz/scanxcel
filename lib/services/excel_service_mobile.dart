@@ -1,15 +1,15 @@
 import 'dart:io';
 import 'package:excel/excel.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import '../services/settings_service.dart';
+import '../utils/error_handler.dart';
 import 'dart:convert';
 
 class ExcelService {
   Future<void> exportAndOpen(List<Map<String, dynamic>> rows) async {
     if (rows.isEmpty) {
-      Fluttertoast.showToast(msg: 'Veri tabanında kaydedilmiş veri bulunmuyor.');
+      ErrorHandler.showNoDataWarning();
       return;
     }
 
@@ -78,14 +78,14 @@ class ExcelService {
     final bytes = excel.encode();
     
     if (bytes == null) {
-      Fluttertoast.showToast(msg: 'Excel oluşturulamadı.');
+      ErrorHandler.showFileError('Excel oluşturulamadı.');
       return;
     }
     
     final file = File(path);
     file.writeAsBytesSync(bytes, flush: true);
     
-    Fluttertoast.showToast(msg: 'Veriler Excel\'e aktarıldı. Açılıyor...');
+    ErrorHandler.showExportSuccess();
     await OpenFile.open(path);
   }
 }

@@ -91,5 +91,30 @@
   "dynamicFieldConfiguration": "⚙️ Dinamik alan yapılandırması",
   "localDataStorage": "💾 Yerel veri saklama",
   "advancedSearchFeatures": "🔍 Gelişmiş arama özellikleri",
-  "copyright": "© 2024 ScanXcel. Tüm hakları saklıdır."
+  "copyright": "© 2024 ScanXcel. Tüm hakları saklıdır.",
+  "dataProcessingError": "Veri İşleme Hatası",
+  "connectionError": "Bağlantı Hatası",
+  "cameraError": "Kamera Hatası",
+  "fileProcessingError": "Dosya İşleme Hatası",
+  "permissionError": "İzin Hatası",
+  "dataDeleted": "Veri silindi.",
+  "allDataDeleted": "Tüm veriler silindi.",
+  "recordUpdated": "Kayıt güncellendi.",
+  "settingsLoadError": "Ayarlar yükleme hatası: ",
+  "dataLoadError": "Veri yükleme hatası: ",
+  "deleteError": "Silme hatası: ",
+  "bulkDeleteError": "Toplu silme hatası: ",
+  "updateError": "Güncelleme hatası: ",
+  "excelFileNotFound": "Excel dosyası bulunamadı.",
+  "excelFileFound": "Excel dosyası bulundu. Dosya yöneticisinden açabilirsiniz.",
+  "fileOpenError": "Dosya açma hatası: ",
+  "useDownloadedExcel": "Webde indirdiğiniz Excel dosyasını kullanın.",
+  "barcodeScanned": "Barkod tarandı: {code}",
+  "@barcodeScanned": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  }
 }
