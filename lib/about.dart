@@ -48,12 +48,18 @@ class AboutPage extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 8.0),
-              Text(
-                '${AppLocalizations.of(context)!.version} ${VersionHelper.cachedVersion}',
-                style: TextStyle(
-                  fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14.0, tablet: 16.0, desktop: 18.0),
-                  color: Colors.grey[600],
-                ),
+              FutureBuilder<String>(
+                future: VersionHelper.version,
+                builder: (context, snapshot) {
+                  final version = snapshot.data ?? VersionHelper.cachedVersion;
+                  return Text(
+                    '${AppLocalizations.of(context)!.version} $version',
+                    style: TextStyle(
+                      fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14.0, tablet: 16.0, desktop: 18.0),
+                      color: Colors.grey[600],
+                    ),
+                  );
+                },
               ),
               SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 24.0, tablet: 32.0, desktop: 40.0)),
               Card(

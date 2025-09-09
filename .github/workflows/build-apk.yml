@@ -48,6 +48,32 @@ jobs:
         id: get_version
         run: echo "VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)" >> $GITHUB_OUTPUT
         
+      - name: Generate release notes
+        id: generate_notes
+        run: |
+          # Son commit mesajından release notları oluştur
+          COMMIT_MSG=$(git log -1 --pretty=format:"%s")
+          COMMIT_BODY=$(git log -1 --pretty=format:"%b")
+          DATE=$(date '+%Y-%m-%d %H:%M:%S')
+          
+          # Commit body'den değişiklik notlarını çıkar
+          CHANGES=""
+          if [[ -n "$COMMIT_BODY" ]]; then
+            # Emoji'li satırları bul
+            CHANGES=$(echo "$COMMIT_BODY" | grep -E "^- [🚀✨🔧🐛📱🎨🔗🛡️⚡🎯📋]" | head -8)
+          fi
+          
+          # Eğer değişiklik bulunamazsa commit mesajından çıkar
+          if [[ -z "$CHANGES" ]]; then
+            CHANGES="- 🔧 $COMMIT_MSG"
+          fi
+          
+          echo "COMMIT_MSG=$COMMIT_MSG" >> $GITHUB_OUTPUT
+          echo "DATE=$DATE" >> $GITHUB_OUTPUT
+          echo "CHANGES<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        
       - name: Rename APK file
         run: |
           cd build/app/outputs/flutter-apk
@@ -60,26 +86,40 @@ jobs:
           name: Release v${{ steps.get_version.outputs.VERSION }}
           tag_name: v${{ steps.get_version.outputs.VERSION }}
           body: |
-            ## ScanXcel v${{ steps.get_version.outputs.VERSION }}
+            ## 🚀 ScanXcel v${{ steps.get_version.outputs.VERSION }}
+            
+            **Release Date**: ${{ steps.generate_notes.outputs.DATE }}
+            
+            ### ✨ What's New
+            ${{ steps.generate_notes.outputs.CHANGES }}
             
             ### 📱 APK Download
-            - **scanxcel.apk** - Android APK file
+            - **scanxcel.apk** - Android APK dosyası (Ready to install)
+            - **Size**: ~15MB
+            - **Min SDK**: Android 5.0 (API 21+)
+            - **Target SDK**: Android 13 (API 33)
             
-            ### 🚀 Features
-            - Advanced barcode scanning
-            - Excel export functionality
-            - Cross-platform support
-            - Modern UI/UX
-            - Mobile update checker system
-            - Web APK download button
+            ### 📋 Installation Guide
+            1. **Download** the `scanxcel.apk` file
+            2. **Enable** "Install from unknown sources" in Android settings
+            3. **Install** the APK file on your device
+            4. **Open** ScanXcel and start scanning!
             
-            ### 📋 Installation
-            1. Download the APK file
-            2. Enable "Install from unknown sources" in Android settings
-            3. Install the APK file
+            ### 🌐 Web Version
+            🔗 **[Try Live Demo](https://barisgrbz.github.io/scanxcel/)** - No installation required!
             
-            ### 🔗 Web Version
-            [Try the web version](https://barisgrbz.github.io/scanxcel/)
+            ### 🔄 Update from Previous Version
+            - In-app update notification will appear automatically
+            - Or download and install manually from this release
+            
+            ### 🛠️ Technical Details
+            - **Framework**: Flutter 3.27.0+
+            - **Platform**: Android, Web, iOS (coming soon)
+            - **Features**: Barcode scanning, Excel export, Multi-language support
+            
+            ---
+            
+            💡 **Tip**: Use the web version for quick scanning or download the APK for full mobile experience!
           draft: false
           prerelease: false
         env:

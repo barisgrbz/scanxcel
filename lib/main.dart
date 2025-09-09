@@ -50,6 +50,12 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _loadLanguage();
     _checkForUpdates();
+    _initializeVersion();
+  }
+  
+  Future<void> _initializeVersion() async {
+    // VersionHelper'ı initialize et
+    await VersionHelper.version;
   }
 
   Future<void> _loadLanguage() async {
@@ -480,7 +486,16 @@ class MyHomePageState extends State<MyHomePage> {
                       child: Image.asset('assets/icons/icon.png'),
                     ),
                                          Text(AppLocalizations.of(context)!.appTitle, style: TextStyle(fontSize: 15)),
-                     Text('${AppLocalizations.of(context)!.version}:${VersionHelper.cachedVersion}', style: TextStyle(fontSize: 8)),
+                     FutureBuilder<String>(
+                       future: VersionHelper.version,
+                       builder: (context, snapshot) {
+                         final version = snapshot.data ?? VersionHelper.cachedVersion;
+                         return Text(
+                           '${AppLocalizations.of(context)!.version}:$version',
+                           style: TextStyle(fontSize: 8),
+                         );
+                       },
+                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [

@@ -1,38 +1,33 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class VersionHelper {
   static String? _cachedVersion;
   
-  /// pubspec.yaml'dan versiyon bilgisini alır
+  /// package_info_plus'dan versiyon bilgisini alır
   static Future<String> get version async {
     if (_cachedVersion != null) return _cachedVersion!;
     
     try {
-      // pubspec.yaml dosyasını oku
-      final String manifestContent = await rootBundle.loadString('pubspec.yaml');
-      
-      // Versiyon satırını bul
-      final RegExp versionRegex = RegExp(r'version:\s*([^\s]+)');
-      final Match? match = versionRegex.firstMatch(manifestContent);
-      
-      if (match != null) {
-        final String fullVersion = match.group(1)!;
-        // +1 kısmını kaldır, sadece 1.4.0 al
-        final String version = fullVersion.split('+')[0];
-        _cachedVersion = version;
-        return version;
-      }
+      final packageInfo = await PackageInfo.fromPlatform();
+      _cachedVersion = packageInfo.version;
+      return _cachedVersion!;
+    } on MissingPluginException {
+      // Web'de plugin çalışmazsa
+      _cachedVersion = '1.4.2'; // Current version
+      return _cachedVersion!;
     } catch (e) {
-      print('Error reading version: $e');
+      if (kDebugMode) {
+        print('Error getting version: $e');
+      }
+      _cachedVersion = '1.4.2'; // Current version
+      return _cachedVersion!;
     }
-    
-    // Fallback
-    _cachedVersion = '1.4.0';
-    return _cachedVersion!;
   }
   
   /// Versiyon bilgisini cache'den alır (sync)
-  static String get cachedVersion => _cachedVersion ?? '1.4.0';
+  static String get cachedVersion => _cachedVersion ?? 'Yükleniyor...';
   
   /// Versiyon numarasını temizler (v1.4.0 -> 1.4.0)
   static String cleanVersion(String version) {

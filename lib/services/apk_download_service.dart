@@ -16,6 +16,10 @@ class ApkDownloadService {
   /// APK'yı indir ve yükleme ekranını aç
   static Future<bool> downloadAndInstallApk() async {
     try {
+      if (kDebugMode) {
+        print('Starting APK download and install process...');
+      }
+      
       // İzinleri kontrol et
       if (!await _checkPermissions()) {
         if (kDebugMode) {
@@ -24,13 +28,21 @@ class ApkDownloadService {
         return false;
       }
       
+      if (kDebugMode) {
+        print('Permissions granted, fetching APK URL...');
+      }
+      
       // APK URL'sini al
       final apkUrl = await _getApkDownloadUrl();
       if (apkUrl == null) {
         if (kDebugMode) {
-          print('APK URL not found');
+          print('APK URL not found - no release available');
         }
         return false;
+      }
+      
+      if (kDebugMode) {
+        print('APK URL found: $apkUrl');
       }
       
       // APK'yı indir
@@ -42,11 +54,15 @@ class ApkDownloadService {
         return false;
       }
       
+      if (kDebugMode) {
+        print('APK downloaded successfully: ${apkFile.path}');
+      }
+      
       // APK'yı yükleme ekranını aç
       final result = await OpenFile.open(apkFile.path);
       
       if (kDebugMode) {
-        print('Open file result: ${result.message}');
+        print('Open file result: ${result.message}, type: ${result.type}');
       }
       
       return result.type == ResultType.done;
@@ -62,20 +78,67 @@ class ApkDownloadService {
   /// GitHub API'den APK indirme URL'sini al
   static Future<String?> _getApkDownloadUrl() async {
     try {
+      if (kDebugMode) {
+        print('Fetching latest release from GitHub API...');
+      }
+      
       final response = await http.get(Uri.parse(_githubApiUrl));
+      
+      if (kDebugMode) {
+        print('GitHub API response status: ${response.statusCode}');
+      }
       
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final assets = data['assets'] as List<dynamic>?;
+        
+        if (kDebugMode) {
+          print('Release tag: ${data['tag_name']}');
+          print('Number of assets: ${assets?.length ?? 0}');
+          if (assets != null) {
+            for (final asset in assets) {
+              print('Asset found: ${asset['name']}');
+            }
+          }
+        }
         
         if (assets != null) {
           // scanxcel.apk dosyasını bul
           for (final asset in assets) {
             final name = asset['name'] as String?;
             if (name == 'scanxcel.apk') {
-              return asset['browser_download_url'] as String?;
+              final downloadUrl = asset['browser_download_url'] as String?;
+              if (kDebugMode) {
+                print('Found scanxcel.apk: $downloadUrl');
+              }
+              return downloadUrl;
             }
           }
+          
+          // scanxcel.apk bulunamadıysa, herhangi bir .apk dosyasını bul
+          for (final asset in assets) {
+            final name = asset['name'] as String?;
+            if (name != null && name.endsWith('.apk')) {
+              final downloadUrl = asset['browser_download_url'] as String?;
+              if (kDebugMode) {
+                print('Found APK file: $name -> $downloadUrl');
+              }
+              return downloadUrl;
+            }
+          }
+          
+          if (kDebugMode) {
+            print('No APK files found in assets');
+          }
+        } else {
+          if (kDebugMode) {
+            print('No assets found in release');
+          }
+        }
+      } else {
+        if (kDebugMode) {
+          print('GitHub API request failed: ${response.statusCode}');
+          print('Response body: ${response.body}');
         }
       }
       
