@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../services/update_checker.dart';
+import '../services/apk_download_service.dart';
 
-class UpdateDialog extends StatelessWidget {
+class UpdateDialog extends StatefulWidget {
   final UpdateInfo updateInfo;
   
   const UpdateDialog({
@@ -10,6 +11,14 @@ class UpdateDialog extends StatelessWidget {
     required this.updateInfo,
   });
 
+  @override
+  State<UpdateDialog> createState() => _UpdateDialogState();
+}
+
+class _UpdateDialogState extends State<UpdateDialog> {
+  bool _isDownloading = false;
+  String _downloadStatus = '';
+  
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -57,7 +66,7 @@ class UpdateDialog extends StatelessWidget {
                         style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
                       Text(
-                        updateInfo.currentVersion,
+                        widget.updateInfo.currentVersion,
                         style: TextStyle(
                           color: Colors.grey[600],
                           fontFamily: 'monospace',
@@ -74,7 +83,7 @@ class UpdateDialog extends StatelessWidget {
                         style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
                       Text(
-                        updateInfo.latestVersion,
+                        widget.updateInfo.latestVersion,
                         style: const TextStyle(
                           color: Colors.green,
                           fontWeight: FontWeight.bold,
@@ -90,7 +99,7 @@ class UpdateDialog extends StatelessWidget {
             const SizedBox(height: 16),
             
             // Güncelleme notları
-            if (updateInfo.releaseNotes.isNotEmpty) ...[
+            if (widget.updateInfo.releaseNotes.isNotEmpty) ...[
               Text(
                 AppLocalizations.of(context)!.releaseNotes,
                 style: const TextStyle(
@@ -107,11 +116,53 @@ class UpdateDialog extends StatelessWidget {
                   border: Border.all(color: Colors.blue[200]!),
                 ),
                 child: Text(
-                  _formatReleaseNotes(updateInfo.releaseNotes),
+                  _formatReleaseNotes(widget.updateInfo.releaseNotes),
                   style: const TextStyle(fontSize: 14),
                 ),
               ),
               const SizedBox(height: 16),
+            ],
+            
+            // İndirme progress
+            if (_isDownloading) ...[
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.blue[200]!),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue[700]!),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            _downloadStatus.isNotEmpty 
+                                ? _downloadStatus 
+                                : 'APK indiriliyor...',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.blue[700],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ],
             
             // Bilgi notu
@@ -146,30 +197,85 @@ class UpdateDialog extends StatelessWidget {
         ),
       ),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(
-            AppLocalizations.of(context)!.later,
-            style: TextStyle(color: Colors.grey[600]),
-          ),
-        ),
-        ElevatedButton.icon(
-          onPressed: () {
-            Navigator.of(context).pop();
-            UpdateChecker.downloadUpdate(updateInfo.downloadUrl);
-          },
-          icon: const Icon(Icons.download),
-          label: Text(AppLocalizations.of(context)!.downloadUpdate),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+        if (!_isDownloading) ...[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              AppLocalizations.of(context)!.later,
+              style: TextStyle(color: Colors.grey[600]),
             ),
           ),
-        ),
+          ElevatedButton.icon(
+            onPressed: _downloadAndInstall,
+            icon: const Icon(Icons.download),
+            label: Text(AppLocalizations.of(context)!.downloadUpdate),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+        ] else ...[
+          TextButton(
+            onPressed: null, // Disabled during download
+            child: Text(
+              'İndiriliyor...',
+              style: TextStyle(color: Colors.grey[400]),
+            ),
+          ),
+        ],
       ],
     );
+  }
+  
+  /// APK'yı indir ve yükleme ekranını aç
+  Future<void> _downloadAndInstall() async {
+    setState(() {
+      _isDownloading = true;
+      _downloadStatus = 'APK indiriliyor...';
+    });
+    
+    try {
+      // APK'yı indir ve yükleme ekranını aç
+      final success = await ApkDownloadService.downloadAndInstallApk();
+      
+      if (success) {
+        setState(() {
+          _downloadStatus = 'APK indirildi! Yükleme ekranı açılıyor...';
+        });
+        
+        // Dialog'u kapat
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+      } else {
+        setState(() {
+          _downloadStatus = 'İndirme başarısız! GitHub sayfasına yönlendiriliyor...';
+        });
+        
+        // Fallback: GitHub sayfasını aç
+        await Future.delayed(const Duration(seconds: 2));
+        await UpdateChecker.downloadUpdate(widget.updateInfo.downloadUrl);
+        
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _downloadStatus = 'Hata oluştu! GitHub sayfasına yönlendiriliyor...';
+      });
+      
+      // Fallback: GitHub sayfasını aç
+      await Future.delayed(const Duration(seconds: 2));
+      await UpdateChecker.downloadUpdate(widget.updateInfo.downloadUrl);
+      
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    }
   }
   
   /// Release notes'u formatla
