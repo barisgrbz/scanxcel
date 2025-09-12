@@ -46,6 +46,12 @@ jobs:
           echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
           echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
           echo "storeFile=$GITHUB_WORKSPACE/android/app/my-release.jks" >> android/key.properties
+          
+          # Debug: Show the created key.properties content
+          echo "=== key.properties content ==="
+          cat android/key.properties
+          echo "=== keystore file exists ==="
+          ls -la android/app/my-release.jks
         
       - name: Build APK
         run: flutter build apk --release
