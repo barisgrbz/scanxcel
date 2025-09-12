@@ -24,6 +24,7 @@ import 'widgets/modern_button.dart';
 import 'widgets/download_app_button.dart';
 import 'widgets/update_dialog.dart';
 import 'services/update_checker.dart';
+import 'services/permission_service.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -70,6 +71,7 @@ class _MyAppState extends State<MyApp> {
     if (!kIsWeb) {
       try {
         final updateInfo = await UpdateChecker.checkForUpdates();
+        
         if (updateInfo != null && updateInfo.hasUpdate) {
           // Context'i almak için bir sonraki frame'de göster
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -151,7 +153,13 @@ class MyHomePageState extends State<MyHomePage> {
   // Loading states
   bool _isSaving = false;
   
-
+  @override
+  void initState() {
+    super.initState();
+    updateCurrentTime();
+    _loadSettings();
+    _requestInitialPermissions();
+  }
 
   void updateCurrentTime() {
     currentTime = DateTime.now();
@@ -215,13 +223,6 @@ class MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    updateCurrentTime();
-    _loadSettings();
-  }
-
   Future<void> _loadSettings() async {
     try {
       final s = await _settingsService.load();
@@ -234,6 +235,17 @@ class MyHomePageState extends State<MyHomePage> {
     } catch (e) {
       if (mounted) {
         ErrorHandler.showError('Ayarlar yükleme hatası: ${ErrorHandler.getErrorMessage(e)}');
+      }
+    }
+  }
+
+  Future<void> _requestInitialPermissions() async {
+    // İlk açılışta gerekli izinleri iste
+    try {
+      await PermissionService.requestAllPermissions();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Initial permissions request failed: $e');
       }
     }
   }
@@ -502,10 +514,17 @@ class MyHomePageState extends State<MyHomePage> {
                         IconButton(
                           icon: Icon(Icons.person),
                           onPressed: () async {
-                            final url = 'https://github.com/barisgrbz';
-                            final uri = Uri.parse(url);
-                            if (await canLaunchUrl(uri)) {
-                              await launchUrl(uri, mode: LaunchMode.externalApplication);
+                            try {
+                              final url = 'https://github.com/barisgrbz';
+                              final uri = Uri.parse(url);
+                              
+                              if (await canLaunchUrl(uri)) {
+                                await launchUrl(uri, mode: LaunchMode.externalApplication);
+                              }
+                            } catch (e) {
+                              if (kDebugMode) {
+                                print('GitHub URL launch error: $e');
+                              }
                             }
                           },
                         ),

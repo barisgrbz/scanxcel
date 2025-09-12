@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 
 class UpdateChecker {
   static const String _githubApiUrl = 'https://api.github.com/repos/barisgrbz/scanxcel/releases/latest';
-  static const String _githubReleaseUrl = 'https://github.com/barisgrbz/scanxcel/releases/latest';
+  static const String _githubReleaseUrl = 'https://github.com/barisgrbz/scanxcel/r:eleases/latest';
   
   /// GitHub API'den son versiyonu kontrol et
   static Future<UpdateInfo?> checkForUpdates() async {

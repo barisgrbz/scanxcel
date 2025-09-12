@@ -16,60 +16,44 @@ class ApkDownloadService {
   /// APK'yı indir ve yükleme ekranını aç
   static Future<bool> downloadAndInstallApk() async {
     try {
-      if (kDebugMode) {
-        print('Starting APK download and install process...');
-      }
-      
       // İzinleri kontrol et
       if (!await _checkPermissions()) {
         if (kDebugMode) {
-          print('Storage permission denied');
+          print('APK download failed: Permissions denied');
         }
         return false;
-      }
-      
-      if (kDebugMode) {
-        print('Permissions granted, fetching APK URL...');
       }
       
       // APK URL'sini al
       final apkUrl = await _getApkDownloadUrl();
       if (apkUrl == null) {
         if (kDebugMode) {
-          print('APK URL not found - no release available');
+          print('APK download failed: No release available');
         }
         return false;
-      }
-      
-      if (kDebugMode) {
-        print('APK URL found: $apkUrl');
       }
       
       // APK'yı indir
       final apkFile = await _downloadApk(apkUrl);
       if (apkFile == null) {
         if (kDebugMode) {
-          print('APK download failed');
+          print('APK download failed: Download error');
         }
         return false;
-      }
-      
-      if (kDebugMode) {
-        print('APK downloaded successfully: ${apkFile.path}');
       }
       
       // APK'yı yükleme ekranını aç
       final result = await OpenFile.open(apkFile.path);
       
       if (kDebugMode) {
-        print('Open file result: ${result.message}, type: ${result.type}');
+        print('APK install result: ${result.message}, type: ${result.type}');
       }
       
       return result.type == ResultType.done;
       
     } catch (e) {
       if (kDebugMode) {
-        print('Download and install error: $e');
+        print('APK download and install error: $e');
       }
       return false;
     }
@@ -78,29 +62,11 @@ class ApkDownloadService {
   /// GitHub API'den APK indirme URL'sini al
   static Future<String?> _getApkDownloadUrl() async {
     try {
-      if (kDebugMode) {
-        print('Fetching latest release from GitHub API...');
-      }
-      
       final response = await http.get(Uri.parse(_githubApiUrl));
-      
-      if (kDebugMode) {
-        print('GitHub API response status: ${response.statusCode}');
-      }
       
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final assets = data['assets'] as List<dynamic>?;
-        
-        if (kDebugMode) {
-          print('Release tag: ${data['tag_name']}');
-          print('Number of assets: ${assets?.length ?? 0}');
-          if (assets != null) {
-            for (final asset in assets) {
-              print('Asset found: ${asset['name']}');
-            }
-          }
-        }
         
         if (assets != null) {
           // scanxcel.apk dosyasını bul
@@ -154,7 +120,9 @@ class ApkDownloadService {
   /// APK'yı indir
   static Future<File?> _downloadApk(String url) async {
     try {
-      final response = await http.get(Uri.parse(url));
+      final client = http.Client();
+      final request = http.Request('GET', Uri.parse(url));
+      final response = await client.send(request).timeout(const Duration(seconds: 30));
       
       if (response.statusCode == 200) {
         // Downloads klasörünü al
@@ -169,17 +137,29 @@ class ApkDownloadService {
         // APK dosyasını oluştur
         final apkFile = File('${directory.path}/scanxcel.apk');
         
-        // APK'yı yaz
-        await apkFile.writeAsBytes(response.bodyBytes);
-        
         if (kDebugMode) {
-          print('APK downloaded to: ${apkFile.path}');
+          print('Saving APK to: ${apkFile.path}');
         }
         
+        // Stream'den dosyayı yaz
+        final bytes = await response.stream.toBytes();
+        await apkFile.writeAsBytes(bytes);
+        
+        final fileSize = await apkFile.length();
+        if (kDebugMode) {
+          print('APK downloaded successfully: ${apkFile.path}');
+          print('File size: ${fileSize} bytes');
+        }
+        
+        client.close();
         return apkFile;
+      } else {
+        if (kDebugMode) {
+          print('Download failed with status: ${response.statusCode}');
+        }
+        client.close();
+        return null;
       }
-      
-      return null;
     } catch (e) {
       if (kDebugMode) {
         print('Download APK error: $e');
@@ -191,17 +171,27 @@ class ApkDownloadService {
   /// Gerekli izinleri kontrol et
   static Future<bool> _checkPermissions() async {
     try {
-      // Android 13+ için READ_EXTERNAL_STORAGE gerekli değil
-      if (Platform.isAndroid) {
-        final androidInfo = await DeviceInfoPlugin().androidInfo;
-        if (androidInfo.version.sdkInt >= 33) {
-          return true; // Android 13+ için izin gerekli değil
-        }
+      if (!Platform.isAndroid) return true;
+      
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      
+      // 1. Storage izinleri
+      bool storageGranted = true;
+      if (androidInfo.version.sdkInt < 33) {
+        // Android 13 altı için storage izni
+        final status = await Permission.storage.request();
+        storageGranted = status == PermissionStatus.granted;
       }
       
-      // Eski Android versiyonları için storage izni
-      final status = await Permission.storage.request();
-      return status == PermissionStatus.granted;
+      // 2. INSTALL_PACKAGES izni (Android 8.0+)
+      bool installGranted = true;
+      if (androidInfo.version.sdkInt >= 26) {
+        // Android 8.0+ için REQUEST_INSTALL_PACKAGES izni gerekli
+        final installStatus = await Permission.requestInstallPackages.request();
+        installGranted = installStatus == PermissionStatus.granted;
+      }
+      
+      return storageGranted && installGranted;
       
     } catch (e) {
       if (kDebugMode) {

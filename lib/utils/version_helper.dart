@@ -15,13 +15,13 @@ class VersionHelper {
       return _cachedVersion!;
     } on MissingPluginException {
       // Web'de plugin çalışmazsa
-      _cachedVersion = '1.4.2'; // Current version
+      _cachedVersion = '1.4.3'; // Current version
       return _cachedVersion!;
     } catch (e) {
       if (kDebugMode) {
         print('Error getting version: $e');
       }
-      _cachedVersion = '1.4.2'; // Current version
+      _cachedVersion = '1.4.3'; // Current version
       return _cachedVersion!;
     }
   }

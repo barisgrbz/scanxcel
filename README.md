@@ -1,4 +1,4 @@
-﻿# ScanXcel v1.4.2 🚀
+﻿# ScanXcel v1.5.0 🚀
 
 <div align="center">
 
@@ -20,6 +20,13 @@
 ## 🎯 **Hakkında**
 
 ScanXcel, modern işletmeler ve bireysel kullanıcılar için tasarlanmış **cross-platform** barkod tarama ve Excel export uygulamasıdır. Flutter teknolojisi ile geliştirilmiş olan uygulama, **Android**, **Web** ve **iOS** platformlarında sorunsuz çalışır.
+
+### 🎉 **v1.5.0 Yenilikleri**
+- 🔐 **Runtime Permissions**: Kamera, depolama ve APK kurulum izinleri
+- 📱 **Automatic Permission Requests**: Uygulama başlatıldığında otomatik izin isteme
+- 🛡️ **PermissionService**: Merkezi izin yönetim sistemi
+- 📋 **Android Manifest Queries**: URL launcher için Android 11+ desteği
+- 🔄 **Cross-Platform Compatibility**: Tüm Android sürümleri için uyumluluk
 
 ### 🎉 **v1.4.2 Yenilikleri**
 - 🔧 **Versiyon Gösterimi Düzeltmesi**: About ve ana sayfada doğru versiyon bilgisi gösterimi
@@ -135,6 +142,8 @@ flutter run
 - **Database**: SQLite (Mobile), LocalStorage (Web)
 - **Export**: Excel (.xlsx) formatı
 - **Scanner**: ZXing (Web), mobile_scanner (Mobile)
+- **Permissions**: permission_handler (Runtime permissions)
+- **Device Info**: device_info_plus (Android version checks)
 
 ---
 
@@ -269,7 +278,7 @@ Bu proje [GPL v3](LICENSE) lisansı altında lisanslanmıştır.
 - **ZXing**: Barkod tarama kütüphanesi için
 - **Excel Package**: Excel export için
 - **Topluluk**: Geri bildirim ve katkılar için
-- **[@ahmethakandinger](https://github.com/hakandinger)** - Proje ana yapısı destekleri 
+- **[@hakandinger](https://github.com/hakandinger)** - Proje ana yapısı destekleri 
 için teşekkürler! 🚀
 ---
 
@@ -283,10 +292,10 @@ için teşekkürler! 🚀
 
 <div align="center">
 
-**ScanXcel v1.4.2** - Next-generation barkod tarama ve Excel export uygulaması ✨
+**ScanXcel v1.5.0** - Next-generation barkod tarama ve Excel export uygulaması ✨
 
-> 🚀 **v1.0 MVP'den v1.4.2 Production'a** - Versiyon yönetimi düzeltmeleri, APK otomatik indirme, centralized version management, auto build system ve advanced features ile güçlendirilmiş
+> 🚀 **v1.0 MVP'den v1.5.0 Production'a** - Runtime permissions, automatic permission requests, PermissionService, Android 11+ support ve clean GitHub release ile güçlendirilmiş
 
-[⬆️ **Başa Dön**](#scanxcel-v14-)
+[⬆️ **Başa Dön**](#scanxcel-v15-)
 
 </div>
