@@ -7,7 +7,7 @@ class PermissionService {
   
   /// [SADECE TEST AMAÇLI] Tüm gerekli izinleri kontrol et ve iste
   /// Play Store için: Bu metot kullanılmamalı! İhtiyaç anında izin istenmelidir.
-  @deprecated
+  @Deprecated('Play Store için uygun değil. requestCameraPermission, requestStoragePermission veya requestInstallPermission kullanın.')
   static Future<bool> requestAllPermissions() async {
     if (!Platform.isAndroid) return true;
     

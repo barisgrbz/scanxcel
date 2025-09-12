@@ -3,7 +3,7 @@
   "appTitle": "ScanXcel",
   "saveButton": "Save",
   "viewRecordsButton": "View Records",
-  "clearDatabaseButton": "Clear Barcodes",
+  "clearDatabaseButton": "Clear Data",
   "exportToExcelButton": "Export to Excel",
   "showExcelButton": "Show Excel",
   "settingsButton": "Settings",

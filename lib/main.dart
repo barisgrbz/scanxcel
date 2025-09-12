@@ -476,7 +476,7 @@ class MyHomePageState extends State<MyHomePage> {
                         Expanded(
                                                   child: ModernButton(
                              text: AppLocalizations.of(context)!.showExcelButton,
-                             onPressed: openExcelFile,
+                             onPressed: () => openExcelFile(context),
                              icon: Icons.info_outline,
                             backgroundColor: const Color(0xFFF59E0B),
                           ),
@@ -642,7 +642,7 @@ class SquareButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 70,
       child: ElevatedButton(
         onPressed: onPressed,

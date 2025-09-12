@@ -1,9 +1,9 @@
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/material.dart';
 import 'services/data_service.dart' if (dart.library.html) 'services/data_service.dart';
 import 'services/excel_service.dart' if (dart.library.html) 'services/excel_service.dart';
 import 'services/permission_service.dart';
 import 'utils/error_handler.dart';
+import 'widgets/excel_files_dialog.dart';
 
 void clearDatabase() async {
   try {
@@ -45,45 +45,15 @@ void exportToExcel() async {
 
 // Ayarlar açma özelliği kaldırıldı (izin gereksiz)
 
-void openExcelFile() async {
+void openExcelFile(BuildContext context) async {
   try {
-    // Web'de indirilen dosya kullanılır (Platform çağrısı webde UnsupportedError atabilir)
-    bool isWeb = false;
-    try {
-      // accessing a getter to trigger on web
-      Platform.isAndroid;
-    } catch (_) {
-      isWeb = true;
-    }
-    if (isWeb) {
-      ErrorHandler.showInfo('Webde indirdiğiniz Excel dosyasını kullanın.');
-      return;
-    }
-
-    // İzin gerektirmez: mobil uygulama klasörü
-
-    // Uygulamaya özel klasördeki sabit dosyayı aç
-    Directory? targetDirectory;
-    if (Platform.isAndroid) {
-      targetDirectory = await getExternalStorageDirectory();
-      targetDirectory ??= await getApplicationDocumentsDirectory();
-    } else {
-      targetDirectory = await getApplicationDocumentsDirectory();
-    }
-
-    if (!targetDirectory.existsSync()) {
-      ErrorHandler.showWarning('Excel dosyası bulunamadı.');
-      return;
-    }
-
-    final filePath = '${targetDirectory.path}/barkodlar.xlsx';
-    final file = File(filePath);
-    
-    if (await file.exists()) {
-      ErrorHandler.showInfo('Excel dosyası bulundu. Dosya yöneticisinden açabilirsiniz.');
-    } else {
-      ErrorHandler.showWarning('Excel dosyası bulunamadı.');
-    }
+    // Excel dosyaları dialog'unu aç
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return const ExcelFilesDialog();
+      },
+    );
   } catch (e) {
     ErrorHandler.showFileError(e);
   }

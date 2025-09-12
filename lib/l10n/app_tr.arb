@@ -3,7 +3,7 @@
   "appTitle": "ScanXcel",
   "saveButton": "Kaydet",
   "viewRecordsButton": "Kayıtları Görüntüle",
-  "clearDatabaseButton": "Barkodları Temizle",
+  "clearDatabaseButton": "Verileri Temizle",
   "exportToExcelButton": "Excel'e Aktar",
   "showExcelButton": "Excel'i Göster",
   "settingsButton": "Ayarlar",

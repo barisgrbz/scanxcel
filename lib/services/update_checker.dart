@@ -62,8 +62,12 @@ class UpdateChecker {
       final currentParts = currentClean.split('.').map(int.parse).toList();
       
       // Eksik parçaları 0 ile doldur
-      while (latestParts.length < 3) latestParts.add(0);
-      while (currentParts.length < 3) currentParts.add(0);
+      while (latestParts.length < 3) {
+        latestParts.add(0);
+      }
+      while (currentParts.length < 3) {
+        currentParts.add(0);
+      }
       
       // Major.Minor.Patch karşılaştırması
       for (int i = 0; i < 3; i++) {
