@@ -5,9 +5,17 @@ import 'package:device_info_plus/device_info_plus.dart';
 
 class PermissionService {
   
-  /// Tüm gerekli izinleri kontrol et ve iste
+  /// [SADECE TEST AMAÇLI] Tüm gerekli izinleri kontrol et ve iste
+  /// Play Store için: Bu metot kullanılmamalı! İhtiyaç anında izin istenmelidir.
+  @deprecated
   static Future<bool> requestAllPermissions() async {
     if (!Platform.isAndroid) return true;
+    
+    // GitHub release için geçici - Play Store'da bu kod silinecek
+    if (kDebugMode) {
+      print('⚠️ [WARNING] requestAllPermissions sadece test amaçlıdır!');
+      print('⚠️ [WARNING] Play Store için ihtiyaç anında izin istenmeli!');
+    }
     
     try {
       final androidInfo = await DeviceInfoPlugin().androidInfo;
@@ -86,7 +94,7 @@ class PermissionService {
     }
   }
   
-  /// Sadece storage izni iste
+  /// [PLAY STORE UYUMLU] Storage izni iste - Excel export öncesi
   static Future<bool> requestStoragePermission() async {
     if (!Platform.isAndroid) return true;
     
@@ -94,28 +102,74 @@ class PermissionService {
       final androidInfo = await DeviceInfoPlugin().androidInfo;
       final androidVersion = androidInfo.version.sdkInt;
       
-      PermissionStatus status;
+      if (kDebugMode) {
+        print('💾 [PERMISSIONS] Requesting storage permission for Excel export...');
+      }
+      
+      Map<Permission, PermissionStatus> permissions = {};
       
       if (androidVersion >= 33) {
-        // Android 13+ için READ_MEDIA_* izinleri
-        final photos = await Permission.photos.request();
-        final videos = await Permission.videos.request();
-        status = (photos == PermissionStatus.granted && videos == PermissionStatus.granted) 
-          ? PermissionStatus.granted 
-          : PermissionStatus.denied;
+        // Android 13+ için medya izinleri
+        permissions[Permission.photos] = await Permission.photos.request();
+        permissions[Permission.videos] = await Permission.videos.request();
+        // Excel dosyaları için external storage
+        permissions[Permission.manageExternalStorage] = await Permission.manageExternalStorage.request();
+      } else if (androidVersion >= 30) {
+        // Android 11-12 için MANAGE_EXTERNAL_STORAGE
+        permissions[Permission.manageExternalStorage] = await Permission.manageExternalStorage.request();
       } else {
-        // Android 13 altı için READ_EXTERNAL_STORAGE
-        status = await Permission.storage.request();
+        // Android 10 ve altı için READ_EXTERNAL_STORAGE
+        permissions[Permission.storage] = await Permission.storage.request();
+      }
+      
+      // En az bir izin granted olmalı
+      final anyGranted = permissions.values.any(
+        (status) => status == PermissionStatus.granted,
+      );
+      
+      if (kDebugMode) {
+        permissions.forEach((permission, status) {
+          print('💾 [PERMISSIONS] $permission: $status');
+        });
+        print('💾 [PERMISSIONS] Storage permission result: $anyGranted');
+      }
+      
+      return anyGranted;
+    } catch (e) {
+      if (kDebugMode) {
+        print('❌ [PERMISSIONS] Storage permission error: $e');
+      }
+      return false;
+    }
+  }
+
+  /// [PLAY STORE UYUMLU] Install izni iste - APK güncelleme öncesi  
+  static Future<bool> requestInstallPermission() async {
+    if (!Platform.isAndroid) return true;
+    
+    try {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      final androidVersion = androidInfo.version.sdkInt;
+      
+      if (androidVersion < 26) {
+        // Android 8.0 altında install izni gerekmiyor
+        return true;
       }
       
       if (kDebugMode) {
-        print('💾 [PERMISSIONS] Storage permission: $status');
+        print('📦 [PERMISSIONS] Requesting install permission for APK update...');
+      }
+      
+      final status = await Permission.requestInstallPackages.request();
+      
+      if (kDebugMode) {
+        print('📦 [PERMISSIONS] Install permission: $status');
       }
       
       return status == PermissionStatus.granted;
     } catch (e) {
       if (kDebugMode) {
-        print('❌ [PERMISSIONS] Storage permission error: $e');
+        print('❌ [PERMISSIONS] Install permission error: $e');
       }
       return false;
     }

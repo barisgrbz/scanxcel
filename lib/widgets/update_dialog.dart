@@ -18,6 +18,9 @@ class UpdateDialog extends StatefulWidget {
 class _UpdateDialogState extends State<UpdateDialog> {
   bool _isDownloading = false;
   String _downloadStatus = '';
+  double _downloadProgress = 0.0;
+  int _downloadedBytes = 0;
+  int _totalBytes = 0;
   
   @override
   Widget build(BuildContext context) {
@@ -98,7 +101,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
             
             const SizedBox(height: 16),
             
-            // Güncelleme notları
+            // Güncelleme notları - Kaydırılabilir
             if (widget.updateInfo.releaseNotes.isNotEmpty) ...[
               Text(
                 AppLocalizations.of(context)!.releaseNotes,
@@ -109,21 +112,27 @@ class _UpdateDialogState extends State<UpdateDialog> {
               ),
               const SizedBox(height: 8),
               Container(
+                height: 120, // Sabit yükseklik - kaydırılabilir
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.blue[50],
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.blue[200]!),
                 ),
-                child: Text(
-                  _formatReleaseNotes(widget.updateInfo.releaseNotes),
-                  style: const TextStyle(fontSize: 14),
+                child: Scrollbar(
+                  thumbVisibility: true,
+                  child: SingleChildScrollView(
+                    child: Text(
+                      _formatReleaseNotes(widget.updateInfo.releaseNotes),
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
             ],
             
-            // İndirme progress
+            // İndirme progress - Gelişmiş
             if (_isDownloading) ...[
               const SizedBox(height: 16),
               Container(
@@ -135,31 +144,71 @@ class _UpdateDialogState extends State<UpdateDialog> {
                 ),
                 child: Column(
                   children: [
+                    // Progress bar ve durum
                     Row(
                       children: [
                         SizedBox(
-                          width: 20,
-                          height: 20,
+                          width: 24,
+                          height: 24,
                           child: CircularProgressIndicator(
-                            strokeWidth: 2,
+                            strokeWidth: 3,
+                            value: _downloadProgress > 0 ? _downloadProgress / 100 : null,
                             valueColor: AlwaysStoppedAnimation<Color>(Colors.blue[700]!),
+                            backgroundColor: Colors.blue[200],
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: Text(
-                            _downloadStatus.isNotEmpty 
-                                ? _downloadStatus 
-                                : 'APK indiriliyor...',
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _downloadStatus.isNotEmpty 
+                                    ? _downloadStatus 
+                                    : 'APK indiriliyor...',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.blue[700],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              if (_downloadProgress > 0) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${_downloadProgress.toStringAsFixed(1)}% • ${_formatBytes(_downloadedBytes)} / ${_formatBytes(_totalBytes)}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.blue[600],
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                        if (_downloadProgress > 0)
+                          Text(
+                            '${_downloadProgress.toStringAsFixed(0)}%',
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.blue[700],
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ),
                       ],
                     ),
+                    // Linear progress bar
+                    if (_downloadProgress > 0) ...[
+                      const SizedBox(height: 12),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: _downloadProgress / 100,
+                          backgroundColor: Colors.blue[200],
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue[600]!),
+                          minHeight: 6,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -234,8 +283,26 @@ class _UpdateDialogState extends State<UpdateDialog> {
   Future<void> _downloadAndInstall() async {
     setState(() {
       _isDownloading = true;
-      _downloadStatus = 'APK indiriliyor...';
+      _downloadStatus = 'İzinler kontrol ediliyor...';
+      _downloadProgress = 0.0;
     });
+    
+    // Progress callback'i ayarla
+    ApkDownloadService.onProgress = (received, total) {
+      if (mounted) {
+        setState(() {
+          _downloadedBytes = received;
+          _totalBytes = total;
+          _downloadProgress = total > 0 ? (received / total) * 100 : 0.0;
+          
+          if (_downloadProgress < 100) {
+            _downloadStatus = 'APK indiriliyor...';
+          } else {
+            _downloadStatus = 'İndirme tamamlandı!';
+          }
+        });
+      }
+    };
     
     try {
       // APK'yı indir ve yükleme ekranını aç
@@ -244,6 +311,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
       if (success) {
         setState(() {
           _downloadStatus = 'APK indirildi! Yükleme ekranı açılıyor...';
+          _downloadProgress = 100.0;
         });
         
         // Dialog'u kapat
@@ -275,10 +343,13 @@ class _UpdateDialogState extends State<UpdateDialog> {
       if (mounted) {
         Navigator.of(context).pop();
       }
+    } finally {
+      // Callback'i temizle
+      ApkDownloadService.onProgress = null;
     }
   }
   
-  /// Release notes'u formatla
+  /// Release notes'u formatla - Artık tam metin gösteriliyor (kaydırılabilir)
   String _formatReleaseNotes(String notes) {
     // GitHub markdown'dan temizle
     String formatted = notes
@@ -288,11 +359,20 @@ class _UpdateDialogState extends State<UpdateDialog> {
         .replaceAll(RegExp(r'`(.*?)`'), r'$1') // Code'u kaldır
         .replaceAll(RegExp(r'\[(.*?)\]\(.*?\)'), r'$1'); // Link'leri kaldır
     
-    // İlk 200 karakteri al
-    if (formatted.length > 200) {
-      formatted = '${formatted.substring(0, 200)}...';
-    }
-    
+    // Artık tam metni göster - kaydırılabilir olduğu için
     return formatted.trim();
+  }
+  
+  /// Byte'ları kullanıcı dostu formata çevir
+  String _formatBytes(int bytes) {
+    if (bytes < 1024) {
+      return '$bytes B';
+    } else if (bytes < 1024 * 1024) {
+      return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    } else if (bytes < 1024 * 1024 * 1024) {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    } else {
+      return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+    }
   }
 }

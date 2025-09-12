@@ -4,8 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:device_info_plus/device_info_plus.dart';
+import 'permission_service.dart';
 
 class ApkDownloadService {
   static const String _githubApiUrl = 'https://api.github.com/repos/barisgrbz/scanxcel/releases/latest';
@@ -16,7 +15,7 @@ class ApkDownloadService {
   /// APK'yı indir ve yükleme ekranını aç
   static Future<bool> downloadAndInstallApk() async {
     try {
-      // İzinleri kontrol et
+      // [PLAY STORE UYUMLU] Install izni ihtiyaç anında isteniyor
       if (!await _checkPermissions()) {
         if (kDebugMode) {
           print('APK download failed: Permissions denied');
@@ -117,12 +116,12 @@ class ApkDownloadService {
     }
   }
   
-  /// APK'yı indir
+  /// APK'yı indir - Progress tracking ile
   static Future<File?> _downloadApk(String url) async {
     try {
       final client = http.Client();
       final request = http.Request('GET', Uri.parse(url));
-      final response = await client.send(request).timeout(const Duration(seconds: 30));
+      final response = await client.send(request).timeout(const Duration(seconds: 60));
       
       if (response.statusCode == 200) {
         // Downloads klasörünü al
@@ -141,9 +140,47 @@ class ApkDownloadService {
           print('Saving APK to: ${apkFile.path}');
         }
         
-        // Stream'den dosyayı yaz
-        final bytes = await response.stream.toBytes();
-        await apkFile.writeAsBytes(bytes);
+        // Content-Length'i al
+        final contentLength = response.contentLength ?? 0;
+        int downloadedBytes = 0;
+        
+        if (kDebugMode) {
+          print('Total size: $contentLength bytes');
+        }
+        
+        // Stream'den dosyayı yaz - Progress tracking ile
+        final sink = apkFile.openWrite();
+        
+        await response.stream.listen(
+          (List<int> chunk) {
+            downloadedBytes += chunk.length;
+            sink.add(chunk);
+            
+            // Progress callback'i çağır
+            if (onProgress != null && contentLength > 0) {
+              onProgress!(downloadedBytes, contentLength);
+            }
+            
+            if (kDebugMode && downloadedBytes % (1024 * 100) == 0) {
+              // Her 100KB'da bir log bas
+              final progress = contentLength > 0 
+                  ? (downloadedBytes / contentLength * 100).toStringAsFixed(1)
+                  : '?';
+              print('Download progress: $progress% ($downloadedBytes / $contentLength bytes)');
+            }
+          },
+          onDone: () async {
+            await sink.close();
+            client.close();
+          },
+          onError: (e) async {
+            await sink.close();
+            client.close();
+            if (kDebugMode) {
+              print('Download stream error: $e');
+            }
+          },
+        ).asFuture();
         
         final fileSize = await apkFile.length();
         if (kDebugMode) {
@@ -151,7 +188,11 @@ class ApkDownloadService {
           print('File size: ${fileSize} bytes');
         }
         
-        client.close();
+        // Final progress update
+        if (onProgress != null) {
+          onProgress!(fileSize, fileSize);
+        }
+        
         return apkFile;
       } else {
         if (kDebugMode) {
@@ -168,34 +209,32 @@ class ApkDownloadService {
     }
   }
   
-  /// Gerekli izinleri kontrol et
+  /// [PLAY STORE UYUMLU] Gerekli izinleri kontrol et - APK indirme ve kurulum için
   static Future<bool> _checkPermissions() async {
     try {
       if (!Platform.isAndroid) return true;
       
-      final androidInfo = await DeviceInfoPlugin().androidInfo;
-      
-      // 1. Storage izinleri
-      bool storageGranted = true;
-      if (androidInfo.version.sdkInt < 33) {
-        // Android 13 altı için storage izni
-        final status = await Permission.storage.request();
-        storageGranted = status == PermissionStatus.granted;
+      if (kDebugMode) {
+        print('🏪 [APK DOWNLOAD] Requesting permissions for APK download and install...');
       }
       
-      // 2. INSTALL_PACKAGES izni (Android 8.0+)
-      bool installGranted = true;
-      if (androidInfo.version.sdkInt >= 26) {
-        // Android 8.0+ için REQUEST_INSTALL_PACKAGES izni gerekli
-        final installStatus = await Permission.requestInstallPackages.request();
-        installGranted = installStatus == PermissionStatus.granted;
+      // Import etmek yerine direkt PermissionService kullan
+      final installGranted = await PermissionService.requestInstallPermission();
+      final storageGranted = await PermissionService.requestStoragePermission();
+      
+      final allGranted = installGranted && storageGranted;
+      
+      if (kDebugMode) {
+        print('🏪 [APK DOWNLOAD] Install permission: $installGranted');
+        print('🏪 [APK DOWNLOAD] Storage permission: $storageGranted');
+        print('🏪 [APK DOWNLOAD] All permissions granted: $allGranted');
       }
       
-      return storageGranted && installGranted;
+      return allGranted;
       
     } catch (e) {
       if (kDebugMode) {
-        print('Permission check error: $e');
+        print('❌ [APK DOWNLOAD] Permission check error: $e');
       }
       return false;
     }

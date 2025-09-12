@@ -240,12 +240,19 @@ class MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _requestInitialPermissions() async {
-    // İlk açılışta gerekli izinleri iste
+    // [PLAY STORE UYUMLU] İzinler ihtiyaç anında isteniyor
+    // Açılışta izin istenmez - sadece permission durumunu kontrol ediyoruz
     try {
-      await PermissionService.requestAllPermissions();
+      final permissions = await PermissionService.checkPermissions();
+      if (kDebugMode) {
+        print('🏪 [PERMISSIONS] Initial permission check:');
+        print('🏪 [PERMISSIONS] Camera: ${permissions['camera']}');
+        print('🏪 [PERMISSIONS] Storage: ${permissions['storage']}');
+        print('🏪 [PERMISSIONS] Install: ${permissions['install']}');
+      }
     } catch (e) {
       if (kDebugMode) {
-        print('Initial permissions request failed: $e');
+        print('❌ [PERMISSIONS] Initial permission check failed: $e');
       }
     }
   }
@@ -578,7 +585,19 @@ class MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _showBarcodeScanner({required int targetIndex}) {
+  Future<void> _showBarcodeScanner({required int targetIndex}) async {
+    // [PLAY STORE UYUMLU] Kamera izni ihtiyaç anında isteniyor
+    final hasPermission = await PermissionService.requestCameraPermission();
+    
+    if (!hasPermission) {
+      if (mounted) {
+        ErrorHandler.showError('Barkod taramak için kamera izni gereklidir.');
+      }
+      return;
+    }
+    
+    if (!mounted) return;
+    
     Navigator.push(
       context,
       MaterialPageRoute(

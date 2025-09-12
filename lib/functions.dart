@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'services/data_service.dart' if (dart.library.html) 'services/data_service.dart';
 import 'services/excel_service.dart' if (dart.library.html) 'services/excel_service.dart';
+import 'services/permission_service.dart';
 import 'utils/error_handler.dart';
 
 void clearDatabase() async {
@@ -17,7 +18,13 @@ void clearDatabase() async {
 
 void exportToExcel() async {
   try {
-    // İzin gerektirmez: web indirme, mobil uygulama klasörü
+    // [PLAY STORE UYUMLU] Storage izni ihtiyaç anında isteniyor
+    final hasPermission = await PermissionService.requestStoragePermission();
+    
+    if (!hasPermission) {
+      ErrorHandler.showError('Excel dosyasını kaydetmek için dosya erişim izni gereklidir.');
+      return;
+    }
 
     // Verileri servis üzerinden al
     final dataService = DataService();
