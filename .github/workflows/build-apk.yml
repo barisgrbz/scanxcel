@@ -65,9 +65,7 @@ jobs:
             # Satır sonu karakterlerini koru
             FULL_BODY="$COMMIT_BODY"
           else
-            FULL_BODY="### $TITLE
-
-Bu güncelleme çeşitli hata düzeltmeleri ve iyileştirmeler içerir."
+            FULL_BODY="### $TITLE"$'\n\n'"Bu güncelleme çeşitli hata düzeltmeleri ve iyileştirmeler içerir."
           fi
           
           echo "COMMIT_MSG=$COMMIT_MSG" >> $GITHUB_OUTPUT
