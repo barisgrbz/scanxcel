@@ -41,11 +41,11 @@ jobs:
           # Decode keystore from GitHub secrets
           echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 -d > android/app/my-release.jks
           
-          # Create key.properties from secrets
+          # Create key.properties from secrets with absolute path
           echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" > android/key.properties
           echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
           echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
-          echo "storeFile=android/app/my-release.jks" >> android/key.properties
+          echo "storeFile=$GITHUB_WORKSPACE/android/app/my-release.jks" >> android/key.properties
         
       - name: Build APK
         run: flutter build apk --release
