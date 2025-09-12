@@ -24,11 +24,16 @@ class PermissionService {
       
       // 2. Storage izinleri (Android versiyonuna göre)
       if (androidVersion >= 33) {
-        // Android 13+ için READ_MEDIA_* izinleri
+        // Android 13+ için hem medya hem de dosya erişimi
         permissions[Permission.photos] = await Permission.photos.request();
         permissions[Permission.videos] = await Permission.videos.request();
+        // Excel dosyalarını yazmak için external storage'a ihtiyaç var
+        permissions[Permission.manageExternalStorage] = await Permission.manageExternalStorage.request();
+      } else if (androidVersion >= 30) {
+        // Android 11-12 için MANAGE_EXTERNAL_STORAGE
+        permissions[Permission.manageExternalStorage] = await Permission.manageExternalStorage.request();
       } else {
-        // Android 13 altı için READ_EXTERNAL_STORAGE
+        // Android 10 ve altı için READ_EXTERNAL_STORAGE
         permissions[Permission.storage] = await Permission.storage.request();
       }
       

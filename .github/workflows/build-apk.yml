@@ -36,6 +36,18 @@ jobs:
       - name: Generate localization files
         run: flutter gen-l10n
         
+      - name: Setup Android signing
+        run: |
+          # Create a deterministic debug keystore for consistency
+          mkdir -p ~/.android
+          
+          # Use a fixed seed for consistent key generation across builds
+          keytool -genkey -v -keystore ~/.android/debug.keystore \
+            -storepass android -alias androiddebugkey -keypass android \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=ScanXcel Debug,O=ScanXcel,C=TR" \
+            -storetype JKS
+        
       - name: Build APK
         run: flutter build apk --release
         
