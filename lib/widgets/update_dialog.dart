@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../services/update_checker.dart';
 import '../services/apk_download_service.dart';
@@ -242,6 +243,37 @@ class _UpdateDialogState extends State<UpdateDialog> {
                 ],
               ),
             ),
+            
+            const SizedBox(height: 8),
+            
+            // Uygulama kapatma uyarısı
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.blue[200]!),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.exit_to_app,
+                    color: Colors.blue[700],
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Güncelleme tamamlandığında uygulama otomatik kapatılacak ve yükleyici açılacaktır.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.blue[700],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -314,10 +346,23 @@ class _UpdateDialogState extends State<UpdateDialog> {
           _downloadProgress = 100.0;
         });
         
+        // 2 saniye bekle ki kullanıcı durumu görebilsin
+        await Future.delayed(const Duration(seconds: 2));
+        
+        setState(() {
+          _downloadStatus = 'Uygulama kapatılıyor ve yükleyici açılıyor...';
+        });
+        
         // Dialog'u kapat
         if (mounted) {
           Navigator.of(context).pop();
         }
+        
+        // 1 saniye bekle ki dialog kapansın
+        await Future.delayed(const Duration(seconds: 1));
+        
+        // Uygulamayı kapat - Bu APK yükleyiciyi açar
+        SystemNavigator.pop();
       } else {
         setState(() {
           _downloadStatus = 'İndirme başarısız! GitHub sayfasına yönlendiriliyor...';

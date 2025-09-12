@@ -45,9 +45,13 @@ class ApkDownloadService {
       final result = await OpenFile.open(apkFile.path);
       
       if (kDebugMode) {
-        print('APK install result: ${result.message}, type: ${result.type}');
+        print('🔧 [APK INSTALL] Opening installer: ${result.message}, type: ${result.type}');
+        print('🔧 [APK INSTALL] APK path: ${apkFile.path}');
+        print('🔧 [APK INSTALL] App will close after installer opens');
       }
       
+      // ResultType.done yükleyicinin açıldığını gösterir
+      // Bu durumda uygulama kapatılacak ve yükleyici görünecek
       return result.type == ResultType.done;
       
     } catch (e) {

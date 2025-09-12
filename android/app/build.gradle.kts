@@ -5,6 +5,9 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+import java.util.Properties
+import java.io.FileInputStream
+
 android {
     namespace = "com.scanxcel.scanxcel"
     compileSdk = flutter.compileSdkVersion
@@ -30,10 +33,32 @@ android {
         versionName = flutter.versionName
     }
 
+    // Production signing configuration
+    signingConfigs {
+        create("release") {
+            val keystorePropertiesFile = File(rootProject.projectDir, "key.properties")
+            if (keystorePropertiesFile.exists()) {
+                val keystoreProperties = Properties()
+                keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+                
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+                storeFile = File(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+            } else {
+                // Fallback to debug signing if key.properties doesn't exist
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+                storeFile = File(System.getProperty("user.home") + "/.android/debug.keystore")
+                storePassword = "android"
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // GitHub release için debug signing kullan
-            signingConfig = signingConfigs.getByName("debug")
+            // Use production signing for consistent GitHub releases
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }

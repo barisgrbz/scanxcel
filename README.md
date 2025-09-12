@@ -1,4 +1,4 @@
-﻿# ScanXcel v1.5.3 🚀
+﻿# ScanXcel v1.5.4 🚀
 
 <div align="center">
 
@@ -21,13 +21,13 @@
 
 ScanXcel, modern işletmeler ve bireysel kullanıcılar için tasarlanmış **cross-platform** barkod tarama ve Excel export uygulamasıdır. Flutter teknolojisi ile geliştirilmiş olan uygulama, **Android**, **Web** ve **iOS** platformlarında sorunsuz çalışır.
 
-### 🎉 **v1.5.3 Yenilikleri**
-- 📊 **Enhanced Update Dialog**: Gelişmiş güncelleme dialog sistemi
-- 📈 **Download Progress**: Real-time indirme progress bar ve yüzde gösterimi
-- 📜 **Scrollable Release Notes**: Kaydırılabilir güncelleme açıklamaları
-- 🏪 **Play Store Ready**: Play Store yayını için optimize edilmiş permission sistemi
-- 🎯 **Better UX**: Kullanıcı dostu indirme deneyimi (MB/GB format desteği)
-- ⚡ **Improved Performance**: On-demand permission system
+### 🎉 **v1.5.4 Yenilikleri**
+- 🚪 **Smart App Close**: APK yükleyici açılmadan önce uygulama otomatik kapanır
+- 🔧 **Production Keystore**: GitHub Actions'da tutarlı APK imzalama sistemi
+- ⚡ **Smooth Transitions**: Kullanıcı dostu güncelleme deneyimi
+- 📱 **SystemNavigator**: Android uyumlu uygulama kapatma
+- 🎯 **Better Notifications**: Kapatma öncesi kullanıcı bilgilendirmesi
+- 🛡️ **Signature Fix**: Package conflict sorununun kesin çözümü
 
 ### 🎉 **v1.5.1 Yenilikleri**
 - 📖 **Enhanced About Page**: Zenginleştirilmiş hakkında sayfası
@@ -308,9 +308,9 @@ için teşekkürler! 🚀
 
 <div align="center">
 
-**ScanXcel v1.5.3** - Next-generation barkod tarama ve Excel export uygulaması ✨
+**ScanXcel v1.5.4** - Next-generation barkod tarama ve Excel export uygulaması ✨
 
-> 🚀 **v1.0 MVP'den v1.5.3 Production'a** - Enhanced storage permissions, consistent signing, update system fix ve improved permission flow ile güçlendirilmiş
+> 🚀 **v1.0 MVP'den v1.5.4 Production'a** - Enhanced storage permissions, consistent signing, update system fix ve improved permission flow ile güçlendirilmiş
 
 [⬆️ **Başa Dön**](#scanxcel-v152-)
 

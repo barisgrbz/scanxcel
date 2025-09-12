@@ -38,15 +38,21 @@ jobs:
         
       - name: Setup Android signing
         run: |
-          # Create a deterministic debug keystore for consistency
+          # Create production keystore for GitHub releases
           mkdir -p ~/.android
           
-          # Use a fixed seed for consistent key generation across builds
-          keytool -genkey -v -keystore ~/.android/debug.keystore \
-            -storepass android -alias androiddebugkey -keypass android \
-            -keyalg RSA -keysize 2048 -validity 10000 \
-            -dname "CN=ScanXcel Debug,O=ScanXcel,C=TR" \
+          # Create a production keystore with fixed parameters for consistency
+          keytool -genkey -v -keystore ~/.android/scanxcel-release.keystore \
+            -storepass "scanxcel2024github" -alias "scanxcel-release" -keypass "scanxcel2024github" \
+            -keyalg RSA -keysize 2048 -validity 25000 \
+            -dname "CN=ScanXcel,O=ScanXcel GitHub Release,L=Istanbul,S=Istanbul,C=TR" \
             -storetype JKS
+          
+          # Create key.properties for release signing
+          echo "storePassword=scanxcel2024github" > android/key.properties
+          echo "keyPassword=scanxcel2024github" >> android/key.properties
+          echo "keyAlias=scanxcel-release" >> android/key.properties
+          echo "storeFile=$HOME/.android/scanxcel-release.keystore" >> android/key.properties
         
       - name: Build APK
         run: flutter build apk --release
