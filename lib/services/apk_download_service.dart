@@ -188,8 +188,8 @@ class ApkDownloadService {
         
         final fileSize = await apkFile.length();
         if (kDebugMode) {
-          print('APK downloaded successfully: ${apkFile.path}');
-          print('File size: $fileSize bytes');
+          debugPrint('APK downloaded successfully: ${apkFile.path}');
+          debugPrint('File size: $fileSize bytes');
         }
         
         // Final progress update

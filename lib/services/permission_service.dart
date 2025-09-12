@@ -53,7 +53,7 @@ class PermissionService {
       // İzin durumlarını logla
       if (kDebugMode) {
         permissions.forEach((permission, status) {
-          print('📋 [PERMISSIONS] $permission: $status');
+          debugPrint('📋 [PERMISSIONS] $permission: $status');
         });
       }
       
@@ -129,9 +129,9 @@ class PermissionService {
       
       if (kDebugMode) {
         permissions.forEach((permission, status) {
-          print('💾 [PERMISSIONS] $permission: $status');
+          debugPrint('💾 [PERMISSIONS] $permission: $status');
         });
-        print('💾 [PERMISSIONS] Storage permission result: $anyGranted');
+        debugPrint('💾 [PERMISSIONS] Storage permission result: $anyGranted');
       }
       
       return anyGranted;

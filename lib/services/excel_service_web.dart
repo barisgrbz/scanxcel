@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:excel/excel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
@@ -125,7 +126,9 @@ class ExcelService {
       await prefs.setString('excel_file_history', jsonEncode(history));
     } catch (e) {
       // Hata durumunda sessizce geç
-      print('Dosya geçmişi kaydedilemedi: $e');
+      if (kDebugMode) {
+        debugPrint('Dosya geçmişi kaydedilemedi: $e');
+      }
     }
   }
 
@@ -151,7 +154,9 @@ class ExcelService {
       
       return availableFiles;
     } catch (e) {
-      print('Dosya geçmişi okunamadı: $e');
+      if (kDebugMode) {
+        debugPrint('Dosya geçmişi okunamadı: $e');
+      }
       return [];
     }
   }

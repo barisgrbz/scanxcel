@@ -46,7 +46,9 @@ class _DownloadAppButtonState extends State<DownloadAppButton> {
         }
       }
     } catch (e) {
-      print('Error fetching release: $e');
+      if (kDebugMode) {
+        debugPrint('Error fetching release: $e');
+      }
     }
   }
 
@@ -153,7 +155,9 @@ class _DownloadAppButtonState extends State<DownloadAppButton> {
         }
       }
     } catch (e) {
-      print('Download error: $e');
+      if (kDebugMode) {
+        debugPrint('Download error: $e');
+      }
       // Hata durumunda releases sayfasına yönlendir
       _openReleasesPage();
     } finally {
@@ -169,7 +173,9 @@ class _DownloadAppButtonState extends State<DownloadAppButton> {
     if (await canLaunchUrl(Uri.parse(releasesUrl))) {
       await launchUrl(Uri.parse(releasesUrl));
     } else {
-      print('Could not launch $releasesUrl');
+      if (kDebugMode) {
+        debugPrint('Could not launch $releasesUrl');
+      }
     }
   }
 }

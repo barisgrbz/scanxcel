@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:html' as html;
 import 'dart:ui_web' as ui;
@@ -55,7 +56,9 @@ class _ScannerViewState extends State<ScannerView> {
       await _startCamera();
 
     } catch (e) {
-      print('Kamera başlatma hatası: $e');
+      if (kDebugMode) {
+        debugPrint('Kamera başlatma hatası: $e');
+      }
       setState(() {
         _error = 'Kamera başlatılamadı: ${ErrorHandler.getErrorMessage(e)}';
         _isLoading = false;
