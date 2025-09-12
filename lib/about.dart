@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:scanxcel/utils/version_helper.dart';
 import 'package:scanxcel/utils/responsive_helper.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/foundation.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -119,6 +121,10 @@ class AboutPage extends StatelessWidget {
                   ),
                 ),
               ),
+              SizedBox(height: 24.0),
+              _buildDeveloperCard(context),
+              SizedBox(height: 24.0),
+              _buildStatsCard(context),
               SizedBox(height: 24.0),
               Text(
                 AppLocalizations.of(context)!.copyright,
@@ -238,5 +244,167 @@ class AboutPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildDeveloperCard(BuildContext context) {
+    return Card(
+      elevation: 4,
+      color: Colors.white,
+      child: Padding(
+        padding: ResponsiveHelper.getResponsiveMargin(context),
+        child: Column(
+          children: [
+            Icon(
+              Icons.developer_mode,
+              size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 36.0, tablet: 42.0, desktop: 48.0),
+              color: Colors.blueGrey,
+            ),
+            SizedBox(height: 16.0),
+            Text(
+              'Geliştirici',
+              style: TextStyle(
+                fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 18.0, tablet: 20.0, desktop: 22.0),
+                fontWeight: FontWeight.bold,
+                color: Colors.blueGrey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 12.0),
+            Text(
+              'Barış GÜRBÜZ',
+              style: TextStyle(
+                fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 16.0, tablet: 18.0, desktop: 20.0),
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 8.0),
+            Text(
+              'Flutter Developer & Software Engineer',
+              style: TextStyle(
+                fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14.0, tablet: 16.0, desktop: 18.0),
+                color: Colors.grey[600],
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 16.0),
+            ElevatedButton.icon(
+              onPressed: () => _launchGitHub(),
+              icon: Icon(Icons.code, size: 18.0),
+              label: Text(
+                'GitHub',
+                style: TextStyle(
+                  fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14.0, tablet: 16.0, desktop: 18.0),
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueGrey,
+                foregroundColor: Colors.white,
+                elevation: 3,
+                padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatsCard(BuildContext context) {
+    return Card(
+      elevation: 3,
+      color: Colors.blue[50],
+      child: Padding(
+        padding: ResponsiveHelper.getResponsiveMargin(context),
+        child: Column(
+          children: [
+            Text(
+              'Uygulama İstatistikleri',
+              style: TextStyle(
+                fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 16.0, tablet: 18.0, desktop: 20.0),
+                fontWeight: FontWeight.bold,
+                color: Colors.blueGrey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 16.0),
+            ResponsiveHelper.isMobile(context) 
+              ? Column(
+                  children: [
+                    _buildStatItem(context, Icons.qr_code_scanner, 'Desteklenen Formatlar', '16+'),
+                    SizedBox(height: 8.0),
+                    _buildStatItem(context, Icons.speed, 'Tarama Hızı', '30ms'),
+                    SizedBox(height: 8.0),
+                    _buildStatItem(context, Icons.devices, 'Platform Desteği', 'Android, Web, iOS'),
+                  ],
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(child: _buildStatItem(context, Icons.qr_code_scanner, 'Desteklenen Formatlar', '16+')),
+                    Expanded(child: _buildStatItem(context, Icons.speed, 'Tarama Hızı', '30ms')),
+                    Expanded(child: _buildStatItem(context, Icons.devices, 'Platform Desteği', 'Cross-Platform')),
+                  ],
+                ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatItem(BuildContext context, IconData icon, String title, String value) {
+    return Column(
+      children: [
+        Icon(
+          icon,
+          size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 24.0, tablet: 28.0, desktop: 32.0),
+          color: Colors.blue[700],
+        ),
+        SizedBox(height: 8.0),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 16.0, tablet: 18.0, desktop: 20.0),
+            fontWeight: FontWeight.bold,
+            color: Colors.blue[800],
+          ),
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(height: 4.0),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 12.0, tablet: 14.0, desktop: 16.0),
+            color: Colors.grey[700],
+          ),
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
+    );
+  }
+
+  Future<void> _launchGitHub() async {
+    try {
+      final url = 'https://github.com/barisgrbz';
+      final uri = Uri.parse(url);
+      
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        if (kDebugMode) {
+          print('GitHub URL launch error: Cannot launch $url');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('GitHub URL launch error: $e');
+      }
+    }
   }
 }

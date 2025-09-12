@@ -3,8 +3,9 @@ name: Build and Release APK
 on:
   push:
     branches: [ main ]
+    paths: [ 'pubspec.yaml' ]  # Sadece pubspec.yaml değişirse tetikle
     tags: [ 'v*' ]
-  workflow_dispatch:
+  workflow_dispatch:  # Manuel tetikleme seçeneği
 
 permissions:
   contents: write
