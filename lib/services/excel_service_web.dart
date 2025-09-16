@@ -10,9 +10,9 @@ import 'dart:html' as html;
 class ExcelService {
   Future<void> exportAndOpen(List<Map<String, dynamic>> rows) async {
     try {
-      if (kDebugMode) {
-        debugPrint('Excel export başladı, veri sayısı: ${rows.length}');
-      }
+      // Her durumda log göster (web'de kDebugMode bazen false oluyor)
+      print('🔍 Excel export başladı, veri sayısı: ${rows.length}');
+      debugPrint('🔍 Excel export başladı, veri sayısı: ${rows.length}');
       
       if (rows.isEmpty) {
         ErrorHandler.showNoDataWarning();
@@ -20,15 +20,13 @@ class ExcelService {
       }
 
       // Ayarları yükle
-      if (kDebugMode) {
-        debugPrint('Ayarlar yükleniyor...');
-      }
+      print('🔍 Ayarlar yükleniyor...');
+      debugPrint('🔍 Ayarlar yükleniyor...');
       final settings = await SettingsService().load();
       
       // Excel oluştur
-      if (kDebugMode) {
-        debugPrint('Excel oluşturuluyor...');
-      }
+      print('🔍 Excel oluşturuluyor...');
+      debugPrint('🔍 Excel oluşturuluyor...');
       final excel = Excel.createExcel();
       final sheet = excel['Sheet1'];
       
@@ -92,29 +90,26 @@ class ExcelService {
       final fileName = 'veriler-$timestamp.xlsx';
 
       // Excel dosyasını indir
-      if (kDebugMode) {
-        debugPrint('Excel encode ediliyor...');
-      }
+      print('🔍 Excel encode ediliyor...');
+      debugPrint('🔍 Excel encode ediliyor...');
       final bytes = excel.encode();
       if (bytes == null) {
+        print('❌ Excel encode başarısız!');
         ErrorHandler.showFileError('Excel oluşturulamadı.');
         return;
       }
 
-      if (kDebugMode) {
-        debugPrint('Excel encode başarılı, boyut: ${bytes.length} bytes');
-      }
+      print('✅ Excel encode başarılı, boyut: ${bytes.length} bytes');
+      debugPrint('✅ Excel encode başarılı, boyut: ${bytes.length} bytes');
 
       // Dosya geçmişini kaydet (Web için)
-      if (kDebugMode) {
-        debugPrint('Dosya geçmişi kaydediliyor...');
-      }
+      print('🔍 Dosya geçmişi kaydediliyor...');
+      debugPrint('🔍 Dosya geçmişi kaydediliyor...');
       await _saveFileHistory(fileName);
 
       // Web'de dosya indirme
-      if (kDebugMode) {
-        debugPrint('Web dosya indirme başlatılıyor...');
-      }
+      print('🔍 Web dosya indirme başlatılıyor...');
+      debugPrint('🔍 Web dosya indirme başlatılıyor...');
       final blob = html.Blob([bytes]);
       final url = html.Url.createObjectUrlFromBlob(blob);
       html.AnchorElement(href: url)
@@ -123,16 +118,19 @@ class ExcelService {
       
       html.Url.revokeObjectUrl(url);
       
-      if (kDebugMode) {
-        debugPrint('Excel export başarılı!');
-      }
+      print('✅ Excel export başarılı!');
+      debugPrint('✅ Excel export başarılı!');
       ErrorHandler.showExportSuccess();
     } catch (e, stackTrace) {
-      if (kDebugMode) {
-        debugPrint('Excel export error: $e');
-        debugPrint('Stack trace: $stackTrace');
-      }
-      ErrorHandler.showFileError('Excel export hatası: ${e.toString()}');
+      // Her durumda hata log'u göster
+      print('❌ Excel export error: $e');
+      print('❌ Stack trace: $stackTrace');
+      debugPrint('❌ Excel export error: $e');
+      debugPrint('❌ Stack trace: $stackTrace');
+      
+      // Detaylı hata mesajı toast'ta göster
+      final errorMessage = e.toString();
+      ErrorHandler.showFileError('Excel export hatası: $errorMessage\n\nConsole\'da detaylı bilgi için F12\'ye basın.');
     }
   }
 
