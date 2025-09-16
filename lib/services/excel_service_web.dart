@@ -10,15 +10,25 @@ import 'dart:html' as html;
 class ExcelService {
   Future<void> exportAndOpen(List<Map<String, dynamic>> rows) async {
     try {
+      if (kDebugMode) {
+        debugPrint('Excel export başladı, veri sayısı: ${rows.length}');
+      }
+      
       if (rows.isEmpty) {
         ErrorHandler.showNoDataWarning();
         return;
       }
 
       // Ayarları yükle
+      if (kDebugMode) {
+        debugPrint('Ayarlar yükleniyor...');
+      }
       final settings = await SettingsService().load();
       
       // Excel oluştur
+      if (kDebugMode) {
+        debugPrint('Excel oluşturuluyor...');
+      }
       final excel = Excel.createExcel();
       final sheet = excel['Sheet1'];
       
@@ -82,16 +92,29 @@ class ExcelService {
       final fileName = 'veriler-$timestamp.xlsx';
 
       // Excel dosyasını indir
+      if (kDebugMode) {
+        debugPrint('Excel encode ediliyor...');
+      }
       final bytes = excel.encode();
       if (bytes == null) {
         ErrorHandler.showFileError('Excel oluşturulamadı.');
         return;
       }
 
+      if (kDebugMode) {
+        debugPrint('Excel encode başarılı, boyut: ${bytes.length} bytes');
+      }
+
       // Dosya geçmişini kaydet (Web için)
+      if (kDebugMode) {
+        debugPrint('Dosya geçmişi kaydediliyor...');
+      }
       await _saveFileHistory(fileName);
 
       // Web'de dosya indirme
+      if (kDebugMode) {
+        debugPrint('Web dosya indirme başlatılıyor...');
+      }
       final blob = html.Blob([bytes]);
       final url = html.Url.createObjectUrlFromBlob(blob);
       html.AnchorElement(href: url)
@@ -99,12 +122,17 @@ class ExcelService {
         ..click();
       
       html.Url.revokeObjectUrl(url);
+      
+      if (kDebugMode) {
+        debugPrint('Excel export başarılı!');
+      }
       ErrorHandler.showExportSuccess();
-    } catch (e) {
+    } catch (e, stackTrace) {
       if (kDebugMode) {
         debugPrint('Excel export error: $e');
+        debugPrint('Stack trace: $stackTrace');
       }
-      ErrorHandler.showFileError('Excel export hatası: ${ErrorHandler.getErrorMessage(e)}');
+      ErrorHandler.showFileError('Excel export hatası: ${e.toString()}');
     }
   }
 
